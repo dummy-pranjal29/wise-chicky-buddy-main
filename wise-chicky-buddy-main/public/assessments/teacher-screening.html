@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Wellbeing Screener — Teacher Informant | Wise Chicky</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap');
+
+  :root {
+    --brand: #1A5C40;
+    --brand-light: #E8F5EE;
+    --brand-mid: #2E7D56;
+    --accent: #F4A228;
+    --accent-light: #FEF3DC;
+    --danger: #D94040;
+    --danger-light: #FDEAEA;
+    --warn: #D97706;
+    --warn-light: #FEF3DC;
+    --ink: #1A1A1A;
+    --ink2: #4A4A4A;
+    --ink3: #7A7A7A;
+    --border: #E2E2DC;
+    --surface: #FAFAF8;
+    --white: #FFFFFF;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--brand);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .site-header .brand { color: #fff; font-size: 15px; font-weight: 500; letter-spacing: .01em; }
+  .site-header .brand span { opacity: .6; font-weight: 300; }
+  .header-badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    background: rgba(255,255,255,.15); color: #fff; font-weight: 400;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .container { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ── PAGE TITLE ── */
+  .page-title { margin-bottom: 28px; }
+  .page-title h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; font-weight: 400;
+    color: var(--ink); line-height: 1.2; margin-bottom: 6px;
+  }
+  .page-title p { font-size: 13px; color: var(--ink3); line-height: 1.6; }
+
+  /* ── STEP INDICATOR ── */
+  .steps {
+    display: flex; gap: 0; margin-bottom: 28px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; background: var(--white);
+  }
+  .step-item {
+    flex: 1; padding: 10px 8px; text-align: center;
+    font-size: 11px; color: var(--ink3); border-right: 1px solid var(--border);
+    transition: all .2s; cursor: pointer;
+  }
+  .step-item:last-child { border-right: none; }
+  .step-item.active { background: var(--brand); color: #fff; }
+  .step-item.done { background: var(--brand-light); color: var(--brand); }
+  .step-num { font-size: 13px; font-weight: 500; display: block; margin-bottom: 2px; }
+
+  /* ── PROGRESS ── */
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-bar {
+    height: 3px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--brand); border-radius: 2px;
+    transition: width .4s ease;
+  }
+  .progress-label { font-size: 11px; color: var(--ink3); margin-top: 5px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
+  }
+  .card-title { font-size: 16px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: var(--ink3); margin-bottom: 20px; line-height: 1.6; }
+
+  /* ── META FORM ── */
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .meta-grid.two { grid-template-columns: 1fr 1fr; }
+  .field label { font-size: 11px; color: var(--ink3); display: block; margin-bottom: 4px; font-weight: 500; letter-spacing: .03em; }
+  .field input, .field select {
+    width: 100%; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--ink);
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none; border-color: var(--brand);
+  }
+
+  /* ── AGE SELECTOR ── */
+  .age-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 6px; }
+  .age-btn {
+    padding: 12px 8px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--white); cursor: pointer; text-align: center;
+    transition: all .15s; font-family: 'DM Sans', sans-serif;
+  }
+  .age-btn .ab-label { font-size: 12px; font-weight: 500; color: var(--ink); display: block; }
+  .age-btn .ab-sub { font-size: 10px; color: var(--ink3); margin-top: 2px; display: block; }
+  .age-btn.active {
+    background: var(--brand); border-color: var(--brand);
+  }
+  .age-btn.active .ab-label, .age-btn.active .ab-sub { color: #fff; }
+  .age-btn:hover:not(.active) { border-color: var(--brand-mid); }
+
+  /* ── DOMAIN NAV ── */
+  .domain-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .dnav-btn {
+    padding: 5px 12px; font-size: 12px; border: 1px solid var(--border);
+    border-radius: 20px; cursor: pointer; background: var(--white); color: var(--ink3);
+    font-family: 'DM Sans', sans-serif; transition: all .15s; white-space: nowrap;
+  }
+  .dnav-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .dnav-btn.done { background: var(--brand-light); color: var(--brand); border-color: transparent; }
+
+  /* ── QUESTION ROW ── */
+  .q-row { padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .q-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .q-text { font-size: 13px; color: var(--ink); margin-bottom: 10px; line-height: 1.6; }
+  .q-num { font-size: 11px; color: var(--ink3); margin-right: 4px; }
+
+  .likert { display: flex; gap: 0; }
+  .likert label { flex: 1; text-align: center; cursor: pointer; }
+  .likert input { display: none; }
+  .likert span {
+    display: block; padding: 6px 4px; font-size: 10px; color: var(--ink3);
+    border: 1px solid var(--border); border-right-width: 0;
+    transition: all .15s; line-height: 1.3; user-select: none;
+  }
+  .likert label:first-child span { border-radius: 6px 0 0 6px; }
+  .likert label:last-child span { border-radius: 0 6px 6px 0; border-right-width: 1px; }
+  .likert input:checked + span {
+    background: var(--brand); color: #fff; border-color: var(--brand);
+    font-weight: 500;
+  }
+  .likert label:has(input:checked) + label span { border-left-color: var(--brand); }
+
+  /* ── NAV BUTTONS ── */
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 20px;
+  }
+  .btn {
+    padding: 9px 20px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    cursor: pointer; background: var(--white); color: var(--ink);
+    transition: all .15s;
+  }
+  .btn:hover { background: var(--surface); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary {
+    background: var(--brand); color: #fff; border-color: var(--brand);
+  }
+  .btn-primary:hover { background: var(--brand-mid); }
+
+  /* ── RESULTS ── */
+  .results-header { margin-bottom: 20px; }
+  .results-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; font-weight: 400; margin-bottom: 4px;
+  }
+  .results-meta { font-size: 12px; color: var(--ink3); }
+
+  .triage-box {
+    border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 16px; border: 1px solid;
+  }
+  .triage-low { background: #EAF5F0; border-color: #B0D9C3; }
+  .triage-mod { background: var(--warn-light); border-color: #F0C070; }
+  .triage-high { background: var(--danger-light); border-color: #F0A0A0; }
+  .triage-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .triage-low .triage-title { color: #0F5C35; }
+  .triage-mod .triage-title { color: #7C4A00; }
+  .triage-high .triage-title { color: #8B1A1A; }
+  .triage-text { font-size: 12px; line-height: 1.7; }
+  .triage-low .triage-text { color: #1A6B45; }
+  .triage-mod .triage-text { color: #8B5500; }
+  .triage-high .triage-text { color: #9B2525; }
+
+  .domain-result {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px;
+  }
+  .dr-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .dr-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .dr-score { font-size: 12px; color: var(--ink3); }
+  .flag-pill {
+    display: inline-block; font-size: 10px; padding: 2px 8px;
+    border-radius: 10px; margin-left: 8px; font-weight: 500;
+  }
+  .fp-low { background: #EAF5F0; color: #0F5C35; }
+  .fp-mod { background: var(--warn-light); color: #7C4A00; }
+  .fp-high { background: var(--danger-light); color: #8B1A1A; }
+  .bar-bg { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+  .bf-low { background: #2E9E6A; }
+  .bf-mod { background: var(--accent); }
+  .bf-high { background: var(--danger); }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px; margin-top: 20px;
+  }
+  .disclaimer p { font-size: 11px; color: var(--ink3); line-height: 1.7; margin-bottom: 6px; }
+  .disclaimer p:last-child { margin-bottom: 0; }
+  .disclaimer strong { color: var(--ink2); font-weight: 500; }
+
+  /* ── METHODOLOGY ── */
+  .method-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .method-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; font-weight: 400; color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .method-sub { font-size: 12px; color: var(--ink3); margin-bottom: 20px; }
+  .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .method-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+  }
+  .mc-title { font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .mc-body { font-size: 11px; color: var(--ink3); line-height: 1.6; }
+
+  .ref-list { }
+  .ref-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-tag {
+    display: inline-block; font-size: 10px; padding: 1px 7px;
+    border-radius: 8px; margin-right: 6px; font-weight: 500;
+  }
+  .rt-india { background: #E1F5EE; color: #0F6E56; }
+  .rt-intl { background: #E6F1FB; color: #185FA5; }
+  .rt-govt { background: #FEF3DC; color: #854F0B; }
+  .ref-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+  .ref-desc { font-size: 11px; color: var(--ink3); line-height: 1.6; margin-top: 2px; }
+
+  .ip-box {
+    background: var(--brand-light); border: 1px solid #B0D9C3;
+    border-radius: var(--radius); padding: 14px 18px; margin-top: 16px;
+  }
+  .ip-box p { font-size: 11px; color: #1A5C40; line-height: 1.7; }
+
+  /* ── PRINT ── */
+  .print-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px; font-size: 12px; font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--white); cursor: pointer; color: var(--ink3);
+    transition: all .15s; margin-top: 16px;
+  }
+  .print-btn:hover { color: var(--ink); border-color: var(--ink3); }
+
+  .restart-btn {
+    margin-top: 12px; padding: 9px 20px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--white); color: var(--ink); cursor: pointer;
+  }
+
+  .hidden { display: none !important; }
+
+  .req-note { font-size: 12px; color: var(--ink3); padding: 20px; text-align: center;
+    background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--border); }
+
+  @media print {
+    .site-header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .btn, .print-btn, .restart-btn, .steps, .domain-nav { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">Wise Chicky <span>| Super Parent AI</span></div>
+  <div class="header-badge">Teacher informant screener</div>
+</header>
+
+<div class="container">
+
+  <!-- Steps -->
+  <div class="steps" id="steps-bar">
+    <div class="step-item active" id="step-ind-0"><span class="step-num">1</span>Child info</div>
+    <div class="step-item" id="step-ind-1"><span class="step-num">2</span>Emotional</div>
+    <div class="step-item" id="step-ind-2"><span class="step-num">3</span>Attention</div>
+    <div class="step-item" id="step-ind-3"><span class="step-num">4</span>Social</div>
+    <div class="step-item" id="step-ind-4"><span class="step-num">5</span>Behaviour</div>
+    <div class="step-item" id="step-ind-5"><span class="step-num">6</span>Autism</div>
+    <div class="step-item" id="step-ind-6"><span class="step-num">7</span>Results</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="prog-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:14%"></div></div>
+    <div class="progress-label" id="prog-label">Step 1 of 7</div>
+  </div>
+
+  <!-- SCREEN 0: Child info -->
+  <div id="screen-0">
+    <div class="page-title">
+      <h1>Child wellbeing screener</h1>
+      <p>Age-adaptive, 5-domain behavioural observation tool for classroom teachers.<br>Complete all sections based on observations over the past 3 months.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Child & class information</div>
+      <div class="card-desc">This information is used only to personalise the report. No data is transmitted without consent.</div>
+      <div class="meta-grid" style="margin-bottom:14px">
+        <div class="field"><label>CHILD'S NAME</label><input type="text" id="f-cname" placeholder="Full name"></div>
+        <div class="field"><label>CLASS / GRADE</label><input type="text" id="f-cclass" placeholder="e.g. Class 4-B"></div>
+        <div class="field"><label>DATE OF BIRTH</label><input type="date" id="f-dob"></div>
+      </div>
+      <div class="meta-grid" style="margin-bottom:14px">
+        <div class="field"><label>TEACHER'S NAME</label><input type="text" id="f-tname" placeholder="Full name"></div>
+        <div class="field"><label>SCHOOL NAME</label><input type="text" id="f-school" placeholder="School name"></div>
+        <div class="field"><label>DATE OF ASSESSMENT</label><input type="date" id="f-date"></div>
+      </div>
+      <div class="meta-grid two">
+        <div class="field"><label>OBSERVATION PERIOD</label><input type="text" id="f-period" placeholder="e.g. August–October 2025"></div>
+        <div class="field"><label>CHILD ON MEDICATION?</label>
+          <select id="f-meds">
+            <option value="unknown">Not sure / prefer not to say</option>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Select child's age group</div>
+      <div class="card-desc">Questions will adapt to the developmental stage. Select the group that best matches the child's current age.</div>
+      <div class="age-grid">
+        <button class="age-btn" onclick="setAge('ec',this)">
+          <span class="ab-label">Early childhood</span>
+          <span class="ab-sub">4–6 years</span>
+        </button>
+        <button class="age-btn" onclick="setAge('pr',this)">
+          <span class="ab-label">Primary</span>
+          <span class="ab-sub">7–9 years</span>
+        </button>
+        <button class="age-btn" onclick="setAge('mi',this)">
+          <span class="ab-label">Middle</span>
+          <span class="ab-sub">10–12 years</span>
+        </button>
+        <button class="age-btn" onclick="setAge('ad',this)">
+          <span class="ab-label">Adolescent</span>
+          <span class="ab-sub">13–16 years</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="goNext()">Begin assessment →</button>
+    </div>
+  </div>
+
+  <!-- SCREENS 1–5: Domains -->
+  <div id="screen-domain" class="hidden">
+    <div class="card">
+      <div class="card-title" id="dom-title"></div>
+      <div class="card-desc" id="dom-desc"></div>
+      <div id="dom-questions"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="goPrev()">← Back</button>
+      <span style="font-size:12px;color:#7A7A7A" id="dom-counter"></span>
+      <button class="btn btn-primary" onclick="goNext()">Next →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: Results -->
+  <div id="screen-results" class="hidden">
+    <div class="results-header">
+      <h2>Screening summary</h2>
+      <div class="results-meta" id="res-meta"></div>
+    </div>
+
+    <div id="triage-main"></div>
+    <div id="domain-results"></div>
+
+    <div class="disclaimer">
+      <p><strong>Important notice:</strong> This screener is a behavioural observation tool only. It does not constitute a clinical diagnosis of any condition. All flagged concerns must be reviewed by a qualified RCI-registered psychologist or school counsellor before any action is taken.</p>
+      <p>Results should be interpreted within the full context of the child's development, home environment, and school history. A single elevated domain score does not indicate a clinical condition.</p>
+      <p><strong>Confidentiality:</strong> This report is intended for the reviewing teacher and school counsellor only. Individual child data must not be shared without parental/guardian consent in line with school data protection policy and the DPDP Act 2023 (India).</p>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <button class="btn btn-primary" onclick="window.print()">Print / save PDF</button>
+      <button class="restart-btn" onclick="restartAll()">Start new assessment</button>
+    </div>
+
+    <!-- Methodology note -->
+    <div class="method-section">
+      <div class="method-title">Clinical basis & methodology</div>
+      <div class="method-sub">For institutional partners, clinical reviewers, and funding bodies</div>
+
+      <div class="method-grid">
+        <div class="method-card">
+          <div class="mc-title">Original items — no licensed reproduction</div>
+          <div class="mc-body">All screening items are original observational statements authored by Wise Chicky Pvt. Ltd. No items are verbatim reproductions from any licensed psychometric instrument.</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-title">Construct-anchored item writing</div>
+          <div class="mc-body">Items operationalise behavioural constructs documented in government-mandated and peer-reviewed frameworks, adapted to classroom-observable behaviour for each age band.</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-title">Age-adaptive calibration</div>
+          <div class="mc-body">4 age bands (4–6, 7–9, 10–12, 13–16 yrs). Constructs remain consistent; item language reflects developmentally appropriate behavioural manifestations at each stage.</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-title">Validation pathway</div>
+          <div class="mc-body">Phase 1: Expert review by RCI-registered psychologists. Phase 2: Pilot N=200+ (Jharkhand schools). Phase 3: Reliability & norm development, journal publication.</div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:500;color:#4A4A4A;margin-bottom:10px">Clinical reference frameworks</div>
+      <div class="ref-list">
+        <div class="ref-item">
+          <span class="ref-tag rt-india">Indian</span><span class="ref-name">ISAA — Indian Scale for Assessment of Autism (2008)</span>
+          <div class="ref-desc">Arya, S. NIEPID / Ministry of Social Justice & Empowerment, Govt. of India. N=1,247, 10 centres, Cronbach's α=0.97. Informs autism indicators domain construct structure and scoring framework.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-india">Indian</span><span class="ref-name">IASQ — Indian Autism Screening Questionnaire</span>
+          <div class="ref-desc">Government of India. Bilingual (Hindi/English) parent-informant screening instrument. Informs social reciprocity and emotional responsiveness construct language.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-intl">International</span><span class="ref-name">NICHQ Vanderbilt Assessment Scales (2002, rev. 2003)</span>
+          <div class="ref-desc">Wolraich, M.L. American Academy of Pediatrics / NICHQ. DSM-IV-anchored teacher and parent scales for ADHD, ODD, conduct disorder, and anxiety/depression. Informs attention & learning and behaviour & self-regulation domains.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-india">Indian</span><span class="ref-name">ELDSC — Early Learning Difficulty Screening Checklist (2024)</span>
+          <div class="ref-desc">Wise Chicky Pvt. Ltd. 7-domain, 32-item original instrument for dyslexia/SLD screening ages 6–14. Grounded in DSM-5, ICD-11, RPwD Act 2016, and Rao et al. (2021) DALI-DAB validation study.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-intl">International</span><span class="ref-name">DSM-5 — Diagnostic and Statistical Manual, 5th edition (2013)</span>
+          <div class="ref-desc">American Psychiatric Association. Primary diagnostic framework for ADHD, ASD, SLD, ODD, Conduct Disorder, and Depressive/Anxiety Disorders. All domain constructs aligned to DSM-5 criteria.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-intl">International</span><span class="ref-name">ICD-11 — International Classification of Diseases, 11th revision (2022)</span>
+          <div class="ref-desc">World Health Organization. Codes 6A02 (ADHD), 6A03 (Developmental Learning Disorder), 6A20 (ASD). Secondary diagnostic framework for global alignment.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-govt">Govt. of India</span><span class="ref-name">RPwD Act 2016 — Rights of Persons with Disabilities Act</span>
+          <div class="ref-desc">Ministry of Law and Justice, Government of India. Statutory definitions of Specific Learning Disabilities and Autism Spectrum Disorder used in Indian legal and educational contexts.</div>
+        </div>
+        <div class="ref-item">
+          <span class="ref-tag rt-india">Indian</span><span class="ref-name">Rao et al. (2021) — DALI-DAB validation study</span>
+          <div class="ref-desc">Rao, C. et al. Annals of Dyslexia, 71(3), 439–457. Development of Dyslexia Assessment for Languages of India battery. Informs biliteracy context and SLD construct adaptation for Indian schools.</div>
+        </div>
+      </div>
+
+      <div class="ip-box">
+        <p><strong>Intellectual property:</strong> All screening items are original works authored by Wise Chicky Pvt. Ltd. and are not reproduced from any licensed psychometric instrument. Reference frameworks are cited for construct grounding only. This tool is available for commercial deployment without third-party licensing obligations. Clinical psychologist sign-off on the item set is recommended prior to institutional rollout. © 2024 Wise Chicky Pvt. Ltd.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const DOMAINS = [
+  {id:'mood', name:'Emotional wellbeing', icon:'Mood'},
+  {id:'attn', name:'Attention & learning', icon:'Attention'},
+  {id:'soc',  name:'Social functioning',   icon:'Social'},
+  {id:'beh',  name:'Behaviour & self-regulation', icon:'Behaviour'},
+  {id:'auto', name:'Autism indicators',    icon:'Autism'}
+];
+
+const QDB = {
+  mood:{
+    ec:['The child appears persistently sad, tearful, or withdrawn without clear reason.',
+        'The child shows frequent and intense emotional outbursts disproportionate to the situation.',
+        'The child expresses excessive fear or anxiety about separation from caregivers.',
+        'The child shows little enjoyment in play activities they previously liked.'],
+    pr:['The child appears sad, unhappy, or low in mood on most days.',
+        'The child expresses feelings of worthlessness or self-blame in class.',
+        'The child shows excessive worry about school, friendships, or family.',
+        'The child is easily overwhelmed or tearful in response to everyday challenges.',
+        'The child shows reduced enthusiasm for activities they previously enjoyed.'],
+    mi:['The student appears persistently sad, flat, or emotionally withdrawn.',
+        'The student expresses hopelessness or makes negative statements about themselves.',
+        'The student shows visible anxiety before exams, presentations, or social situations.',
+        'The student has difficulty recovering after minor setbacks.',
+        'The student avoids class participation due to fear of embarrassment.'],
+    ad:['The student appears persistently low in mood, unmotivated, or emotionally flat.',
+        'The student expresses feelings of hopelessness, worthlessness, or self-criticism.',
+        'The student shows significant anxiety that interferes with academic performance.',
+        'The student is increasingly withdrawn from peers and classroom activities.',
+        'The student shows visible emotional distress that impacts daily functioning.']
+  },
+  attn:{
+    ec:['The child has great difficulty sustaining attention even during preferred activities.',
+        'The child is impulsive — acts before thinking, grabs things, interrupts others frequently.',
+        'The child is unable to follow simple two-step instructions.',
+        'The child is easily distracted by sounds or movement in the environment.'],
+    pr:['The child fails to complete tasks or loses focus before finishing.',
+        'The child makes frequent careless errors despite apparent understanding of the content.',
+        'The child loses materials needed for tasks (books, pencils, assignments).',
+        'The child is easily distracted by minor stimuli during lessons.',
+        'The child has difficulty organising work or following multi-step instructions.'],
+    mi:['The student consistently fails to attend to details or makes careless mistakes.',
+        'The student has difficulty sustaining attention during lessons or independent work.',
+        'The student does not follow through on instructions and fails to complete schoolwork.',
+        'The student is forgetful in daily activities and frequently loses necessary items.',
+        'The student avoids or strongly resists tasks requiring sustained mental effort.'],
+    ad:['The student struggles to concentrate for extended periods on academic tasks.',
+        'The student frequently does not complete assignments or submits incomplete work.',
+        'The student is disorganised in managing academic workload and deadlines.',
+        'The student is easily distracted and has difficulty returning to a task independently.',
+        'There is a significant gap between the student\'s apparent ability and their academic output.']
+  },
+  soc:{
+    ec:['The child shows little interest in playing with other children.',
+        'The child has difficulty sharing or taking turns in group activities.',
+        'The child does not respond with a smile when greeted or praised by familiar adults.',
+        'The child does not seek out teachers or peers for interaction or comfort.'],
+    pr:['The child has few or no friends in the class.',
+        'The child is excluded by peers or struggles to maintain friendships.',
+        'The child has difficulty understanding basic social rules (turn-taking, sharing).',
+        'The child is frequently involved in conflicts with classmates.',
+        'The child appears isolated or lonely in group settings.'],
+    mi:['The student is rejected or excluded by the peer group.',
+        'The student struggles to navigate group dynamics or collaborative tasks.',
+        'The student misreads social cues and responds in ways that seem inappropriate to peers.',
+        'The student is reluctant to participate in group or pair activities.',
+        'The student appears to have no close friendships within the class.'],
+    ad:['The student is socially withdrawn or increasingly isolated from the peer group.',
+        'The student has difficulty forming or maintaining meaningful friendships.',
+        'The student is frequently involved in peer conflict or social friction.',
+        'The student shows poor social judgement in group settings.',
+        'The student appears lonely or speaks of feeling disliked or misunderstood by others.']
+  },
+  beh:{
+    ec:['The child has frequent and intense tantrums that are difficult to de-escalate.',
+        'The child deliberately ignores or refuses adult instructions.',
+        'The child is physically aggressive towards other children or objects.',
+        'The child has difficulty transitioning between activities without significant distress.'],
+    pr:['The child loses temper easily and has difficulty calming down.',
+        'The child actively defies or refuses to comply with teacher instructions.',
+        'The child deliberately annoys or disrupts classmates.',
+        'The child blames others for their own mistakes or misbehaviour.',
+        'The child\'s behaviour is significantly more disruptive than that of peers.'],
+    mi:['The student frequently loses their temper or has anger outbursts in class.',
+        'The student defies teacher instructions or challenges authority openly.',
+        'The student disrupts lessons in ways that affect other students\' learning.',
+        'The student shows poor impulse control — speaks out of turn, interrupts, or acts without thinking.',
+        'The student\'s behaviour has been deteriorating over the observation period.'],
+    ad:['The student is defiant or confrontational with teachers or school authority.',
+        'The student engages in behaviours that disrupt the learning environment for others.',
+        'The student shows poor impulse control in class or social situations.',
+        'The student has been involved in bullying, aggression, or intimidation of peers.',
+        'The student shows increasing disengagement from school norms and expectations.']
+  },
+  auto:{
+    ec:['The child rarely makes or maintains eye contact with adults or peers.',
+        'The child shows little social smile or emotional response when greeted by familiar people.',
+        'The child prefers solitary play and does not seek out other children.',
+        'The child engages in repetitive body movements (e.g. rocking, hand-flapping, spinning).',
+        'The child shows strong distress when routines are changed unexpectedly.',
+        'The child does not point to share interest in something with others (joint attention).'],
+    pr:['The child has poor eye contact in social or conversational situations.',
+        'The child has difficulty following the natural back-and-forth of conversation.',
+        'The child shows intense, narrow interests that dominate their attention and conversation.',
+        'The child engages in repetitive movements or insists on routines, becoming distressed if interrupted.',
+        'The child responds unusually to sensory input (e.g. covers ears, dislikes certain textures or smells).',
+        'The child takes language very literally and misses sarcasm, jokes, or implied meaning.'],
+    mi:['The student has difficulty understanding the unwritten social rules of the classroom.',
+        'The student has very rigid thinking and struggles significantly when plans or expectations change.',
+        'The student communicates in an unusually formal, scripted, or one-sided manner.',
+        'The student has restricted or highly focused interests that dominate conversations.',
+        'The student appears genuinely confused by peer norms, humour, or group dynamics.',
+        'The student has sensory sensitivities (noise, light, clothing) that affect classroom comfort.'],
+    ad:['The student has notable difficulty understanding implied social expectations.',
+        'The student shows very rigid adherence to routines and distress when these change.',
+        'The student has narrow intense interests that dominate conversation and attention.',
+        'The student misreads the intentions or emotions of teachers and peers.',
+        'The student communicates differently from peers in ways that cause social difficulty.',
+        'The student has sensory sensitivities that interfere with classroom engagement.']
+  }
+};
+
+const DOM_DESC = {
+  mood:{ec:'Observe emotional expression, mood variability, and signs of distress. Base ratings on the past 3 months.',pr:'Note frequency and intensity of low mood, worry, and emotional reactivity over the past term.',mi:'Assess mood patterns, anxiety presentation, and emotional resilience against grade-level expectations.',ad:'Evaluate persistent mood changes, academic anxiety, and social withdrawal patterns.'},
+  attn:{ec:'Based on structured activity and free play observation over the past 3 months.',pr:'Observed during classroom work, transitions, and instructional time.',mi:'Assessed against grade-level expectations for independent work and task completion.',ad:'Based on academic performance, self-management, and task completion patterns.'},
+  soc:{ec:'Observe peer interactions during play, group time, and teacher-directed activities.',pr:'Assess during recess, group work, and unstructured time.',mi:'Consider peer acceptance, friendship quality, and conflict patterns.',ad:'Assess depth of social engagement, peer status, and social self-awareness.'},
+  beh:{ec:'Note intensity, frequency, and contexts of challenging behaviour over the past term.',pr:'Assess compliance, emotional control, and impact on the classroom environment.',mi:'Evaluate impulse control, defiance, and classroom disruption patterns.',ad:'Assess conduct, authority relationships, and behavioural trends over time.'},
+  auto:{ec:'Based on direct classroom observation. Autism indicators vary widely at this age — rate only what you have observed.',pr:'Cross-check with parent report when possible. Some items require wider context to rate accurately.',mi:'Consider the student\'s overall communication style and pattern of social understanding.',ad:'Autism presentation at this age may be subtle. Social camouflaging is common, especially in girls.'}
+};
+
+const LIKERT_LABELS = ['Never','Rarely','Sometimes','Often','Almost always'];
+const DOMAIN_THRESH = {mood:.5, attn:.5, soc:.5, beh:.5, auto:.4};
+
+let currentAge = null;
+let currentScreen = 0;
+let answers = {mood:{},attn:{},soc:{},beh:{},auto:{}};
+let scores = {};
+
+function setAge(ag, btn){
+  currentAge = ag;
+  document.querySelectorAll('.age-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function updateSteps(s){
+  for(let i=0;i<7;i++){
+    const el=document.getElementById('step-ind-'+i);
+    el.classList.remove('active','done');
+    if(i===s) el.classList.add('active');
+    else if(i<s) el.classList.add('done');
+  }
+  const pct=Math.round(((s)/6)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent='Step '+(s+1)+' of 7';
+}
+
+function showScreen(n){
+  document.getElementById('screen-0').classList.add('hidden');
+  document.getElementById('screen-domain').classList.add('hidden');
+  document.getElementById('screen-results').classList.add('hidden');
+  if(n===0) document.getElementById('screen-0').classList.remove('hidden');
+  else if(n>=1&&n<=5){
+    document.getElementById('screen-domain').classList.remove('hidden');
+    renderDomain(n-1);
+  } else if(n===6){
+    document.getElementById('screen-results').classList.remove('hidden');
+    buildResults();
+  }
+  updateSteps(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function saveDomainAnswers(di){
+  const d=DOMAINS[di];
+  const qs=QDB[d.id][currentAge];
+  let total=0,filled=0;
+  qs.forEach((_,qi)=>{
+    const checked=document.querySelector('input[name="q_'+d.id+'_'+qi+'"]:checked');
+    if(checked){
+      const v=parseInt(checked.value);
+      answers[d.id][qi]=v;
+      total+=v; filled++;
+    }
+  });
+  if(filled===qs.length){
+    scores[d.id]={raw:total,max:qs.length*4,pct:total/(qs.length*4)};
+  }
+}
+
+function goNext(){
+  if(currentScreen===0){
+    if(!currentAge){ alert('Please select an age group to continue.'); return; }
+  }
+  if(currentScreen>=1&&currentScreen<=5){
+    saveDomainAnswers(currentScreen-1);
+  }
+  currentScreen++;
+  showScreen(currentScreen);
+}
+
+function goPrev(){
+  if(currentScreen>=1&&currentScreen<=5) saveDomainAnswers(currentScreen-1);
+  currentScreen--;
+  showScreen(currentScreen);
+}
+
+function renderDomain(di){
+  const d=DOMAINS[di];
+  const qs=QDB[d.id][currentAge];
+  const desc=DOM_DESC[d.id][currentAge];
+  document.getElementById('dom-title').textContent=d.name;
+  document.getElementById('dom-desc').textContent=desc;
+  document.getElementById('dom-counter').textContent='Domain '+(di+1)+' of '+DOMAINS.length;
+
+  let html='';
+  qs.forEach((q,qi)=>{
+    const saved=answers[d.id][qi];
+    html+='<div class="q-row"><div class="q-text"><span class="q-num">'+(qi+1)+'.</span>'+q+'</div><div class="likert">';
+    LIKERT_LABELS.forEach((lbl,val)=>{
+      const chk=saved===val?'checked':'';
+      html+='<label><input type="radio" name="q_'+d.id+'_'+qi+'" value="'+val+'" '+chk+'><span>'+lbl+'</span></label>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('dom-questions').innerHTML=html;
+}
+
+function buildResults(){
+  const cname=document.getElementById('f-cname').value||'—';
+  const cclass=document.getElementById('f-cclass').value||'—';
+  const tname=document.getElementById('f-tname').value||'—';
+  const fdate=document.getElementById('f-date').value||'—';
+  const ageLabel={ec:'Early childhood (4–6 yrs)',pr:'Primary (7–9 yrs)',mi:'Middle (10–12 yrs)',ad:'Adolescent (13–16 yrs)'}[currentAge];
+  document.getElementById('res-meta').innerHTML='Child: <strong>'+cname+'</strong> &nbsp;|&nbsp; Class: '+cclass+' &nbsp;|&nbsp; Teacher: '+tname+' &nbsp;|&nbsp; Date: '+fdate+' &nbsp;|&nbsp; Age band: '+ageLabel;
+
+  let flaggedHigh=false, flaggedCount=0;
+  let domHTML='';
+
+  DOMAINS.forEach(d=>{
+    const s=scores[d.id];
+    if(!s){ domHTML+='<div class="domain-result"><div class="dr-top"><div class="dr-name">'+d.name+'</div><span style="font-size:12px;color:#7A7A7A">Not completed</span></div></div>'; return; }
+    const thresh=DOMAIN_THRESH[d.id];
+    const pct=s.pct;
+    let fpClass,fpLabel,bfClass;
+    if(pct>=thresh){ fpClass='fp-high'; fpLabel='High concern'; bfClass='bf-high'; flaggedHigh=true; flaggedCount++; }
+    else if(pct>=thresh*0.65){ fpClass='fp-mod'; fpLabel='Moderate concern'; bfClass='bf-mod'; flaggedCount++; }
+    else{ fpClass='fp-low'; fpLabel='Low concern'; bfClass='bf-low'; }
+    const barW=Math.round(pct*100);
+    domHTML+='<div class="domain-result"><div class="dr-top"><div class="dr-name">'+d.name+'<span class="flag-pill '+fpClass+'">'+fpLabel+'</span></div><div class="dr-score">'+s.raw+' / '+s.max+'</div></div><div class="bar-bg"><div class="bar-fill '+bfClass+'" style="width:'+barW+'%"></div></div></div>';
+  });
+  document.getElementById('domain-results').innerHTML=domHTML;
+
+  let triageClass,triageTitle,triageText;
+  if(flaggedHigh||flaggedCount>=3){
+    triageClass='triage-high';
+    triageTitle='High concern — refer for formal assessment';
+    triageText='Multiple domains are flagged at a level requiring attention. Please refer to the school counsellor or a qualified RCI-registered psychologist for a comprehensive evaluation. Discuss findings with the parent/guardian promptly and document the referral. Do not communicate diagnostic conclusions to the family on the basis of this screener alone.';
+  } else if(flaggedCount>=1){
+    triageClass='triage-mod';
+    triageTitle='Moderate concern — monitor and discuss';
+    triageText='One or more domains show elevated scores warranting follow-up. Share observations with the school counsellor. Consider informing the parent/guardian in general terms and re-screening in 6–8 weeks if concerns persist. No referral is required at this stage unless the school counsellor advises otherwise.';
+  } else {
+    triageClass='triage-low';
+    triageTitle='Low concern — continue routine monitoring';
+    triageText='No domains are currently flagged at a high level of concern. Continue routine observation and re-screen at the next academic term, or earlier if new concerns arise. No referral is required at this stage.';
+  }
+  document.getElementById('triage-main').innerHTML='<div class="triage-box '+triageClass+'"><div class="triage-title">'+triageTitle+'</div><div class="triage-text">'+triageText+'</div></div>';
+}
+
+function restartAll(){
+  currentAge=null; currentScreen=0;
+  answers={mood:{},attn:{},soc:{},beh:{},auto:{}}; scores={};
+  document.querySelectorAll('.age-btn').forEach(b=>b.classList.remove('active'));
+  ['f-cname','f-cclass','f-tname','f-school','f-period'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['f-dob','f-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  showScreen(0);
+}
+
+// Set today's date as default
+document.addEventListener('DOMContentLoaded',()=>{
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('f-date').value=today;
+});
+</script>
+</body>
+</html>

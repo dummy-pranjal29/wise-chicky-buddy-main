@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wise Chicky — Child Wellbeing Screening</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --forest:    #2D5016;
+  --moss:      #4A7C2F;
+  --leaf:      #6BA83E;
+  --pale:      #EDF5E5;
+  --pale2:     #F5FAF0;
+  --amber:     #C97B2E;
+  --amber-bg:  #FDF4E7;
+  --red:       #B83B2A;
+  --red-bg:    #FDECEA;
+  --ink:       #1C2B14;
+  --ink2:      #3A4F2C;
+  --mist:      #F4F7F1;
+  --line:      #D4E3C8;
+  --white:     #FFFFFF;
+  --serif:     'Playfair Display', Georgia, serif;
+  --sans:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --radius:    14px;
+  --shadow:    0 2px 16px rgba(44,80,22,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--mist);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.65;
+}
+
+/* ── Top bar ── */
+.topbar {
+  background: var(--forest);
+  padding: 0 28px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-mark {
+  width: 34px; height: 34px;
+  background: var(--leaf);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 18px;
+  color: white;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: var(--serif);
+  color: white;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+}
+.brand-tag {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+.progress-wrap {
+  flex: 1;
+  margin: 0 24px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--leaf);
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+.step-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── Layout ── */
+.shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 36px 20px 100px;
+}
+
+/* ── Step visibility ── */
+.step { display: none; }
+.step.active {
+  display: block;
+  animation: rise 0.3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.card-body { padding: 28px 28px 24px; }
+@media (max-width: 480px) { .card-body { padding: 20px 16px; } }
+
+/* ── Intro ── */
+.intro-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--pale);
+  color: var(--moss);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 18px;
+}
+.intro-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.intro-sub {
+  color: var(--ink2);
+  font-size: 14px;
+  margin-bottom: 24px;
+  max-width: 560px;
+}
+.domains-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.d-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 13px;
+  background: var(--pale2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink2);
+}
+.d-chip .ei { font-size: 15px; }
+
+.notice {
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.notice-amber { background: var(--amber-bg); border-left: 3px solid var(--amber); color: #5C3A0A; }
+.notice-green { background: var(--pale); border-left: 3px solid var(--moss); color: var(--forest); }
+
+/* ── Form ── */
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--pale2);
+}
+.s-num {
+  width: 30px; height: 30px;
+  background: var(--moss);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.s-title { font-family: var(--serif); font-size: 19px; margin-bottom: 3px; }
+.s-sub { font-size: 12px; color: var(--ink2); }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+@media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink2);
+}
+.fg input, .fg select {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.fg input:focus, .fg select:focus {
+  border-color: var(--moss);
+  box-shadow: 0 0 0 3px rgba(74,124,47,0.12);
+}
+
+/* ── Stage banner ── */
+.stage-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(120deg, var(--forest) 0%, var(--ink2) 100%);
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+.stage-icon { font-size: 26px; }
+.stage-label { font-family: var(--serif); color: white; font-size: 16px; margin-bottom: 2px; }
+.stage-range { font-size: 12px; color: rgba(255,255,255,0.6); }
+.stage-note { font-size: 11px; color: var(--leaf); margin-top: 2px; }
+
+/* ── Question items ── */
+.q-block { margin-bottom: 20px; }
+.q-block:last-child { margin-bottom: 0; }
+.q-text {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 9px;
+  line-height: 1.55;
+  padding-left: 18px;
+  position: relative;
+}
+.q-text::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--leaf);
+}
+
+/* Rating row */
+.rating-row {
+  display: flex;
+  gap: 5px;
+}
+.rating-row.r2 .r-opt { flex: 1; }
+.rating-row.r3 .r-opt { flex: 1; }
+.rating-row.r4 .r-opt { flex: 1; }
+.rating-row.r5 .r-opt { flex: 1; }
+
+.r-opt input { display: none; }
+.r-opt label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 4px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink2);
+  text-align: center;
+  transition: all 0.16s;
+  min-height: 52px;
+  line-height: 1.2;
+  width: 100%;
+}
+.r-opt label .rv {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.r-opt input:checked + label {
+  background: var(--forest);
+  border-color: var(--forest);
+  color: rgba(255,255,255,0.85);
+}
+.r-opt input:checked + label .rv { color: white; }
+.r-opt label:hover:not(:has(input:checked)) {
+  border-color: var(--moss);
+  background: var(--pale);
+}
+
+/* Safety */
+.q-block.safety .q-text {
+  background: var(--red-bg);
+  border-left: 3px solid var(--red);
+  padding: 9px 13px 9px 13px;
+  border-radius: 0 8px 8px 0;
+  color: var(--red);
+}
+.q-block.safety .q-text::before { display: none; }
+.safety-alert {
+  display: none;
+  margin-top: 10px;
+  background: var(--red-bg);
+  border: 1.5px solid var(--red);
+  border-radius: 9px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: #7B1A11;
+  line-height: 1.6;
+}
+.safety-alert strong { display: block; color: var(--red); margin-bottom: 5px; font-size: 13px; }
+
+/* Divider between domain groups */
+.q-group-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--moss);
+  padding: 4px 0 10px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; margin-top: 24px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 24px;
+  border-radius: 9px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--forest);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--moss);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(45,80,22,0.28);
+}
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--line);
+  color: var(--ink2);
+}
+.btn-ghost:hover { border-color: var(--moss); color: var(--moss); }
+.btn-xl { padding: 14px 32px; font-size: 15px; }
+
+/* ── Results ── */
+.results-top {
+  text-align: center;
+  padding: 30px 20px 20px;
+}
+.check-ring {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--forest);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 28px;
+}
+.results-title { font-family: var(--serif); font-size: 26px; margin-bottom: 6px; }
+.results-sub { font-size: 13px; color: var(--ink2); }
+
+.domain-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+.domain-row:last-child { border-bottom: none; }
+.domain-name { flex: 1; font-size: 13px; font-weight: 600; }
+.domain-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+.tag-low  { background: #E8F5E3; color: var(--forest); }
+.tag-mid  { background: #FDF0DF; color: #7A4510; }
+.tag-high { background: #FDECEA; color: var(--red); }
+.tag-safe { background: #E8F5E3; color: var(--forest); }
+.tag-flag { background: #FDECEA; color: var(--red); }
+
+.bar-wrap { width: 100px; }
+.bar-track { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 3px; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+.fill-low  { background: var(--moss); }
+.fill-mid  { background: var(--amber); }
+.fill-high { background: var(--red); }
+.bar-pct { font-size: 10px; color: var(--ink2); text-align: right; }
+
+.triage-card {
+  border-radius: 12px;
+  padding: 20px;
+  margin: 18px 0;
+  text-align: center;
+}
+.triage-low  { background: var(--pale); border: 1.5px solid #B2D99B; }
+.triage-mid  { background: var(--amber-bg); border: 1.5px solid #E8C07A; }
+.triage-high { background: var(--red-bg); border: 1.5px solid #E8A098; }
+.triage-card h3 {
+  font-family: var(--serif);
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+.triage-low h3  { color: var(--forest); }
+.triage-mid h3  { color: #7A4510; }
+.triage-high h3 { color: var(--red); }
+.triage-card p { font-size: 13px; color: var(--ink2); max-width: 480px; margin: 0 auto; }
+
+.rec-list { margin-top: 4px; }
+.rec-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.rec-item:last-child { border-bottom: none; }
+.rec-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+.legal-box {
+  background: var(--amber-bg);
+  border: 1px solid #E8C07A;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 11.5px;
+  color: #5C3A0A;
+  margin-top: 18px;
+  line-height: 1.65;
+}
+
+/* Clinical basis box */
+.basis-box {
+  background: var(--pale);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 11.5px;
+  color: var(--forest);
+  margin-top: 0;
+  line-height: 1.65;
+}
+.basis-box strong { display: block; margin-bottom: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">W</div>
+    <div>
+      <div class="brand-name">Wise Chicky</div>
+      <div class="brand-tag">Child Wellbeing Screening</div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progBar"></div>
+  </div>
+  <div class="step-label" id="stepLabel">Intro</div>
+</div>
+
+<div class="shell">
+
+<!-- ════════════════════════════════
+     STEP 0 — INTRO
+════════════════════════════════ -->
+<div class="step active" id="step-0">
+  <div class="card">
+    <div class="card-body">
+      <div class="intro-eyebrow">🌱 Wise Chicky · Parent-Reported Screening</div>
+      <h1 class="intro-title">Child Development &amp;<br>Wellbeing Screening</h1>
+      <p class="intro-sub">A comprehensive, age-adaptive parent-reported screening across key developmental domains. Questions are calibrated to your child's age group and take approximately 10–15 minutes to complete.</p>
+
+      <div class="domains-grid">
+        <div class="d-chip"><span class="ei">😊</span> Emotional Wellbeing</div>
+        <div class="d-chip"><span class="ei">🧘</span> Behaviour & Self-Regulation</div>
+        <div class="d-chip"><span class="ei">🧠</span> Attention & Learning</div>
+        <div class="d-chip"><span class="ei">👫</span> Social Functioning</div>
+        <div class="d-chip"><span class="ei">🔤</span> Language & Learning Skills</div>
+        <div class="d-chip"><span class="ei">🛡️</span> Safety & Wellbeing</div>
+      </div>
+
+      <div class="notice notice-green">
+        <strong>How to answer:</strong> Think about your child's behaviour and functioning over the <strong>past 4 weeks</strong>. Rate each statement honestly based on what you have directly observed. There are no right or wrong answers.
+      </div>
+
+      <div class="notice notice-amber">
+        <strong>Important:</strong> This screening tool is for informational and preventive purposes only. It does not constitute a clinical diagnosis. A high score should be followed up with a qualified RCI-registered psychologist or child development specialist. Individual data is strictly confidential and shared only with you as the parent/guardian.
+      </div>
+
+      <button class="btn btn-primary btn-xl" onclick="goTo(1)">Begin Screening →</button>
+    </div>
+
+    <div style="padding: 14px 28px; border-top: 1px solid var(--line); background: var(--pale2);">
+      <div class="basis-box">
+        <strong>Clinical &amp; Legal Basis</strong>
+        All screening items are original observational statements authored by Wise Chicky Pvt. Ltd. Items are anchored to constructs from: DSM-5 (APA, 2013) · ICD-11 (WHO, 2022) · ISAA — Indian Scale for Assessment of Autism (NIMH/GoI, 2008) · RPwD Act 2016 (Government of India) · NIMHANS Child &amp; Adolescent Mental Health Guidelines · National Mental Health Programme (NMHP) India. No licensed psychometric instrument has been reproduced. © 2026 Wise Chicky Pvt. Ltd. All rights reserved.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     STEP 1 — CHILD INFO
+════════════════════════════════ -->
+<div class="step" id="step-1">
+  <div class="card">
+    <div class="section-head">
+      <div class="s-num">1</div>
+      <div>
+        <div class="s-title">Child & Parent Information</div>
+        <div class="s-sub">Basic details to personalise the assessment for your child's age group</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="fg">
+          <label>Child's Name</label>
+          <input type="text" id="childName" placeholder="e.g. Aarav Sharma">
+        </div>
+        <div class="fg">
+          <label>Date of Birth <span id="ageTag" style="color:var(--moss);font-weight:700"></span></label>
+          <input type="date" id="dob" onchange="autoStage()">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Age Group</label>
+          <select id="ageGroup" onchange="setStage()">
+            <option value="">— Select —</option>
+            <option value="0">0–2 years (Infant / Toddler)</option>
+            <option value="1">3–5 years (Early Childhood)</option>
+            <option value="2">6–9 years (Middle Childhood)</option>
+            <option value="3">10–12 years (Late Childhood)</option>
+            <option value="4">13–17 years (Adolescent)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Child's Gender</label>
+          <select id="gender">
+            <option value="">— Select —</option>
+            <option>Boy</option>
+            <option>Girl</option>
+            <option>Other / Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>Parent / Guardian Name</label>
+          <input type="text" id="parentName" placeholder="Your full name">
+        </div>
+        <div class="fg">
+          <label>Relationship to Child</label>
+          <select id="relation">
+            <option value="Mother">Mother</option>
+            <option value="Father">Father</option>
+            <option value="Grandparent">Grandparent</option>
+            <option value="Guardian">Guardian</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goTo(0)">← Back</button>
+        <button class="btn btn-primary" onclick="validateStep1()">Continue →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Steps 2–7 are rendered dynamically -->
+<div class="step" id="step-2"><div id="s2content"></div></div>
+<div class="step" id="step-3"><div id="s3content"></div></div>
+<div class="step" id="step-4"><div id="s4content"></div></div>
+<div class="step" id="step-5"><div id="s5content"></div></div>
+<div class="step" id="step-6"><div id="s6content"></div></div>
+<div class="step" id="step-7"><div id="s7content"></div></div>
+
+<!-- ════════════════════════════════
+     STEP 8 — RESULTS
+════════════════════════════════ -->
+<div class="step" id="step-8">
+  <div class="card">
+    <div class="results-top">
+      <div class="check-ring">✓</div>
+      <div class="results-title">Screening Complete</div>
+      <div class="results-sub" id="resSub"></div>
+    </div>
+    <div class="card-body" style="padding-top:0">
+      <div id="domainRows"></div>
+      <div id="triageBox"></div>
+      <div class="rec-list" id="recList"></div>
+      <div class="legal-box">
+        This screening is for informational and preventive purposes only and does not constitute a clinical diagnosis or medical advice. All items are original observational statements anchored to internationally recognised developmental constructs. Results should be interpreted by a qualified professional in the context of the child's full developmental history. Individual data is strictly confidential. &nbsp;© 2026 Wise Chicky Pvt. Ltd.
+      </div>
+      <div class="btn-row" style="justify-content:center; margin-top:20px">
+        <button class="btn btn-ghost" onclick="restart()">Start New Screening</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+
+<script>
+// ═══════════════════════════════════════════════════
+// QUESTION BANK
+// All items are ORIGINAL observational statements
+// authored by Wise Chicky Pvt. Ltd.
+// Constructs anchored to: DSM-5, ICD-11, ISAA (NIMH/
+// GoI 2008 — public domain), NIMHANS guidelines,
+// RPwD Act 2016. No licensed instrument reproduced.
+// ═══════════════════════════════════════════════════
+
+// Scale types: 'n' = Never/Rarely/Sometimes/Often/Almost Always (0-4)
+//              'f' = Never/Sometimes/Often (0-2)
+//              'b' = No/Yes (0-1)
+
+const STAGES = [
+  { name:"Infant / Toddler",   range:"0–2 years",  icon:"👶" },
+  { name:"Early Childhood",    range:"3–5 years",  icon:"🧒" },
+  { name:"Middle Childhood",   range:"6–9 years",  icon:"🏫" },
+  { name:"Late Childhood",     range:"10–12 years",icon:"📚" },
+  { name:"Adolescent",         range:"13–17 years",icon:"🌱" },
+];
+
+// Domain configs per stage: each array index = stage 0..4
+// Each item: { q: "question text", s: scale }
+// Constructs & anchors noted in comments
+
+const BANK = {
+
+  // ── DOMAIN A: EMOTIONAL WELLBEING ──────────────────
+  // Anchored to: DSM-5 MDD/anxiety criteria adapted for developmental age;
+  // NIMHANS Child Mental Health Guidelines (2019); ICD-11 mood disorders
+  emotional: [
+    // Stage 0 — Infant/Toddler
+    [
+      { q:"My child rarely smiles or shows delight in response to familiar faces or playful interactions.", s:'b' },
+      { q:"My child is frequently inconsolable and very difficult to soothe when upset.", s:'f' },
+      { q:"My child seems unusually withdrawn or disinterested in people and surroundings.", s:'f' },
+      { q:"My child shows very little excitement, joy, or positive emotion during play or daily routines.", s:'f' },
+    ],
+    // Stage 1 — Early Childhood
+    [
+      { q:"My child often seems sad, tearful, or unhappy without a clear reason.", s:'f' },
+      { q:"My child worries or seems anxious about everyday situations (e.g. going to school, new places).", s:'f' },
+      { q:"My child frequently has intense emotional outbursts that are disproportionate to the situation.", s:'n' },
+      { q:"My child does not seem to enjoy activities, play, or things they previously loved.", s:'f' },
+      { q:"My child makes frequent negative statements about themselves such as 'I'm bad' or 'nobody likes me'.", s:'b' },
+    ],
+    // Stage 2 — Middle Childhood
+    [
+      { q:"My child often seems sad or unhappy, even when there is no obvious reason.", s:'f' },
+      { q:"My child worries excessively about school, family, or friendships.", s:'f' },
+      { q:"My child seems to have lost interest in or enthusiasm for hobbies and activities they previously enjoyed.", s:'f' },
+      { q:"My child frequently expresses feelings of hopelessness — that things will not get better.", s:'f' },
+      { q:"My child is often critical of themselves and makes negative self-statements.", s:'f' },
+    ],
+    // Stage 3 — Late Childhood
+    [
+      { q:"My child is frequently sad, low in mood, or emotionally flat for days at a stretch.", s:'n' },
+      { q:"My child has noticeably lost interest in activities, sports, or hobbies they previously enjoyed.", s:'n' },
+      { q:"My child expresses excessive worry about academic performance, friendships, or family matters.", s:'n' },
+      { q:"My child makes negative statements about themselves or their future ('I'm useless', 'nothing will work out').", s:'n' },
+      { q:"My child feels hopeless — as if situations or feelings will never improve.", s:'n' },
+    ],
+    // Stage 4 — Adolescent
+    [
+      { q:"My child is frequently sad, emotionally empty, or depressed for extended periods.", s:'n' },
+      { q:"My child has lost motivation and interest in most things including hobbies, friends, and school.", s:'n' },
+      { q:"My child experiences excessive anxiety or worry that affects their daily life.", s:'n' },
+      { q:"My child frequently expresses feelings of worthlessness, shame, or being a burden to others.", s:'n' },
+      { q:"My child expresses hopelessness about the future or about things ever getting better.", s:'n' },
+      { q:"My child seems emotionally detached, numb, or disconnected from people around them.", s:'n' },
+    ],
+  ],
+
+  // ── DOMAIN B: BEHAVIOUR & SELF-REGULATION ──────────
+  // Anchored to: DSM-5 ODD/conduct disorder criteria;
+  // ISAA Domain IV (Behaviour Patterns) — NIMH/GoI 2008 (public domain);
+  // NIMHANS guidelines; ICD-11 disruptive behaviour disorders
+  behaviour: [
+    // Stage 0
+    [
+      { q:"My child is extremely difficult to calm once they begin crying or become distressed.", s:'f' },
+      { q:"My child shows very little interest in interacting with caregivers or responding to social stimuli.", s:'f' },
+      { q:"My child engages in repetitive, unusual movements (e.g. persistent rocking, hand flapping, head banging).", s:'b' },
+    ],
+    // Stage 1
+    [
+      { q:"My child has frequent, intense tantrums that are very difficult to manage.", s:'n' },
+      { q:"My child physically hurts others (hitting, biting, kicking) when frustrated or upset.", s:'n' },
+      { q:"My child refuses to follow basic household rules or instructions from parents.", s:'n' },
+      { q:"My child engages in repetitive, fixed play patterns and becomes very distressed if these are disrupted.", s:'b' },
+    ],
+    // Stage 2
+    [
+      { q:"My child argues persistently with adults or refuses reasonable requests.", s:'n' },
+      { q:"My child loses their temper easily and frequently.", s:'n' },
+      { q:"My child is physically aggressive — hits, pushes, or fights with other children.", s:'f' },
+      { q:"My child blames others for their own mistakes rather than taking any responsibility.", s:'f' },
+      { q:"My child deliberately teases, annoys, or provokes others.", s:'f' },
+    ],
+    // Stage 3
+    [
+      { q:"My child argues with adults and actively resists following rules or instructions.", s:'n' },
+      { q:"My child has frequent intense anger outbursts that are out of proportion to the situation.", s:'n' },
+      { q:"My child is easily irritated or made angry by others.", s:'n' },
+      { q:"My child consistently blames others for problems or mistakes rather than reflecting on their own role.", s:'n' },
+      { q:"My child deliberately sets out to upset or provoke others.", s:'n' },
+    ],
+    // Stage 4
+    [
+      { q:"My child is frequently angry, hostile, or irritable towards family members and others.", s:'n' },
+      { q:"My child engages in risky or reckless behaviours without considering consequences.", s:'n' },
+      { q:"My child has been involved in physical fights or threatening behaviour towards others.", s:'n' },
+      { q:"My child has been deliberately dishonest or deceitful with family members.", s:'n' },
+      { q:"My child consistently disregards household rules or social norms.", s:'n' },
+    ],
+  ],
+
+  // ── DOMAIN C: ATTENTION & LEARNING ─────────────────
+  // Anchored to: DSM-5 ADHD criteria (inattentive & hyperactive-impulsive);
+  // ICD-11 ADHD; NIMHANS neurodevelopmental guidelines;
+  // RPwD Act 2016 — SLD & ADHD categories
+  attention: [
+    // Stage 0
+    [
+      { q:"My child does not track faces or moving objects with their eyes as expected for their age.", s:'b' },
+      { q:"My child seems easily overwhelmed or distressed by sounds, movement, or activity in the environment.", s:'f' },
+    ],
+    // Stage 1
+    [
+      { q:"My child cannot sustain attention on a short activity or story for a length of time appropriate for their age.", s:'n' },
+      { q:"My child acts very impulsively — grabbing, running, or doing things before thinking.", s:'n' },
+      { q:"My child is easily pulled away from tasks by sights or sounds around them.", s:'n' },
+      { q:"My child struggles to follow a two-step instruction (e.g. 'put your shoes on and come here').", s:'n' },
+    ],
+    // Stage 2
+    [
+      { q:"My child frequently makes careless mistakes in homework or written work due to inattention.", s:'n' },
+      { q:"My child has significant difficulty sustaining focus on tasks, even ones they enjoy.", s:'n' },
+      { q:"My child is very easily distracted by surrounding noises, people, or objects.", s:'n' },
+      { q:"My child regularly forgets daily routines, instructions, or materials needed for school.", s:'n' },
+      { q:"My child is noticeably restless — fidgeting, squirming, or leaving their seat when expected to sit.", s:'n' },
+    ],
+    // Stage 3
+    [
+      { q:"My child frequently fails to complete homework, chores, or tasks they have started.", s:'n' },
+      { q:"My child has significant difficulty organising their time, belongings, and academic tasks.", s:'n' },
+      { q:"My child loses focus very easily and cannot stay on task without frequent prompting.", s:'n' },
+      { q:"My child is chronically forgetful — losing belongings, missing deadlines, forgetting instructions.", s:'n' },
+      { q:"My child avoids or strongly resists tasks requiring sustained mental effort such as reading or writing.", s:'n' },
+    ],
+    // Stage 4
+    [
+      { q:"My child consistently struggles to complete tasks, assignments, or responsibilities on time.", s:'n' },
+      { q:"My child's life, study space, and belongings are chronically disorganised despite reminders.", s:'n' },
+      { q:"My child is very easily distracted and loses concentration during conversations, study, or activities.", s:'n' },
+      { q:"My child is persistently forgetful in daily life — forgetting appointments, tasks, and commitments.", s:'n' },
+      { q:"My child is noticeably restless or physically unsettled even in situations requiring calmness.", s:'n' },
+    ],
+  ],
+
+  // ── DOMAIN D: SOCIAL FUNCTIONING ───────────────────
+  // Anchored to: ISAA Domain I (Social Relationships & Reciprocity) —
+  // NIMH/GoI 2008 (public domain); DSM-5 ASD social criteria;
+  // ICD-11 social functioning criteria; NIMHANS guidelines
+  social: [
+    // Stage 0
+    [
+      { q:"My child rarely makes eye contact with familiar caregivers during feeding, play, or interaction.", s:'f' },
+      { q:"My child does not smile or show a social response when a familiar person smiles at them.", s:'f' },
+      { q:"My child seems largely unaware of or uninterested in other people in their environment.", s:'f' },
+    ],
+    // Stage 1
+    [
+      { q:"My child strongly prefers to play alone rather than alongside or with other children.", s:'n' },
+      { q:"My child does not seek out or initiate social play or interaction with peers.", s:'n' },
+      { q:"My child does not start or maintain a back-and-forth conversation appropriate for their age.", s:'f' },
+      { q:"My child does not show interest in what other children are doing or playing.", s:'f' },
+    ],
+    // Stage 2
+    [
+      { q:"My child has difficulty making or keeping friends at school.", s:'f' },
+      { q:"My child often feels excluded, left out, or rejected by peers.", s:'f' },
+      { q:"My child's relationship with family members seems strained or distant.", s:'f' },
+      { q:"My child does not understand or respond appropriately to other people's feelings.", s:'f' },
+      { q:"My child refuses to cooperate or take turns during group activities or play.", s:'f' },
+    ],
+    // Stage 3
+    [
+      { q:"My child has withdrawn from friendships or social activities they previously enjoyed.", s:'n' },
+      { q:"My child often feels left out, rejected, or like they do not fit in with peers.", s:'n' },
+      { q:"My child has frequent and significant conflict with siblings or family members.", s:'n' },
+      { q:"My child appears to be experiencing bullying, exclusion, or peer difficulties at school.", s:'b' },
+    ],
+    // Stage 4
+    [
+      { q:"My child has significantly withdrawn from friends, social activities, and family interaction.", s:'n' },
+      { q:"My child expresses deep feelings of loneliness, disconnection, or not belonging.", s:'n' },
+      { q:"My child's relationship with parents or siblings is severely strained or broken down.", s:'n' },
+      { q:"My child is experiencing or has recently experienced bullying or social exclusion.", s:'b' },
+    ],
+  ],
+
+  // ── DOMAIN E: LANGUAGE & LEARNING ──────────────────
+  // Anchored to: ELDSC (Wise Chicky original — all rights reserved);
+  // DSM-5 Specific Learning Disorder; ICD-11 Developmental Learning Disorder;
+  // DALI-DAB (Rao et al. 2021); RPwD Act 2016 SLD definition;
+  // NIMHANS neurodevelopmental assessment guidelines
+  language: [
+    // Stage 0 — developmental milestones (original items)
+    [
+      { q:"My child does not make babbling sounds, coo, or vocalise as expected for their age.", s:'b' },
+      { q:"My child does not consistently respond when their name is called.", s:'b' },
+      { q:"My child has not developed pointing, waving, or showing objects to share interest by 12 months.", s:'b' },
+    ],
+    // Stage 1 — early speech & language
+    [
+      { q:"My child has noticeably fewer words or phrases than other children of the same age.", s:'b' },
+      { q:"My child has significant difficulty expressing their needs or wants through words.", s:'f' },
+      { q:"My child mispronounces words so frequently that they are difficult to understand.", s:'f' },
+      { q:"My child struggles to understand and follow spoken instructions at home.", s:'f' },
+    ],
+    // Stage 2 — literacy & phonological skills
+    [
+      { q:"My child finds it difficult to recognise or produce rhyming words (e.g. cat/bat/hat).", s:'n' },
+      { q:"My child reads noticeably more slowly and with more difficulty than classmates.", s:'n' },
+      { q:"My child frequently writes letters in reverse or confuses visually similar letters (e.g. b/d, p/q).", s:'n' },
+      { q:"My child's written work is considerably weaker than what they can express verbally.", s:'n' },
+      { q:"My child forgets a two or three step instruction almost immediately after it is given.", s:'n' },
+    ],
+    // Stage 3 — reading fluency & written expression
+    [
+      { q:"My child reads slowly and without fluency even in books familiar to them.", s:'n' },
+      { q:"My child spells the same word inconsistently — differently each time — within a single piece of written work.", s:'n' },
+      { q:"My child takes significantly longer than expected to complete written homework, even for simple tasks.", s:'n' },
+      { q:"My child actively avoids reading or writing tasks and becomes distressed when required to do them.", s:'n' },
+      { q:"My child frequently struggles to find the right word mid-conversation and uses vague substitutes like 'thing' or 'stuff'.", s:'n' },
+    ],
+    // Stage 4 — academic & language challenges
+    [
+      { q:"My child actively avoids reading and writing tasks as far as possible.", s:'n' },
+      { q:"My child takes considerably longer than peers to complete any written task.", s:'n' },
+      { q:"My child has significant difficulty organising and expressing thoughts in writing.", s:'n' },
+      { q:"My child frequently has word-finding difficulties during conversation.", s:'n' },
+    ],
+  ],
+
+  // ── DOMAIN F: SAFETY & WELLBEING ───────────────────
+  // Anchored to: ASQ (NIMH/NIH — US federal public domain);
+  // NIMHANS suicide risk guidelines; iCall & Vandrevala protocols;
+  // WHO mhGAP India adaptation; RPwD Act 2016
+  // NOTE: All items are original parent-reported observational statements.
+  // ASQ constructs used as clinical anchor only — no items reproduced verbatim.
+  safety: [
+    // Stage 0 — parental wellbeing (most appropriate for this age)
+    [
+      { q:"I sometimes feel so overwhelmed that I am concerned about my own ability to keep my child safe.", s:'b', crisis:true },
+      { q:"There have been moments when I have felt I might unintentionally harm my child due to extreme stress.", s:'b', crisis:true },
+    ],
+    // Stage 1
+    [
+      { q:"My child has talked about wanting to hurt themselves or disappear.", s:'b', crisis:true },
+      { q:"My child has deliberately hurt themselves (e.g. head banging, biting self, scratching).", s:'b', crisis:true },
+    ],
+    // Stage 2
+    [
+      { q:"My child has expressed wishes to not be alive, to go to sleep and not wake up, or to disappear.", s:'b', crisis:true },
+      { q:"My child has deliberately hurt themselves on purpose.", s:'b', crisis:true },
+      { q:"My child has been exposed to abuse, neglect, or violence at home or elsewhere.", s:'b', crisis:true },
+    ],
+    // Stage 3
+    [
+      { q:"My child has expressed wishes to die, not exist, or not be alive.", s:'b', crisis:true },
+      { q:"My child has deliberately harmed themselves.", s:'b', crisis:true },
+      { q:"My child has talked about suicide, even if it seemed casual or indirect.", s:'b', crisis:true },
+      { q:"My child is experiencing or has experienced abuse or violence in any form.", s:'b', crisis:true },
+    ],
+    // Stage 4
+    [
+      { q:"My child has expressed wishes to die, disappear, or not exist.", s:'b', crisis:true },
+      { q:"My child has deliberately harmed themselves (cutting, burning, hitting themselves).", s:'b', crisis:true },
+      { q:"My child has spoken about suicide — making statements, asking about methods, or making a plan.", s:'b', crisis:true },
+      { q:"My child is currently experiencing or has experienced abuse, exploitation, or violence.", s:'b', crisis:true },
+    ],
+  ],
+};
+
+// Scale definitions
+const SCALES = {
+  n: { labels:["Never","Rarely","Sometimes","Often","Almost Always"], max:4 },
+  f: { labels:["Never","Sometimes","Often"], max:2 },
+  b: { labels:["No","Yes"], max:1 },
+};
+
+const DOMAINS = [
+  { key:'emotional', label:'Emotional Wellbeing',        icon:'😊', step:2 },
+  { key:'behaviour', label:'Behaviour & Self-Regulation',icon:'🧘', step:3 },
+  { key:'attention', label:'Attention & Learning',       icon:'🧠', step:4 },
+  { key:'social',    label:'Social Functioning',         icon:'👫', step:5 },
+  { key:'language',  label:'Language & Learning Skills', icon:'🔤', step:6 },
+  { key:'safety',    label:'Safety & Wellbeing',         icon:'🛡️', step:7 },
+];
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let stage = -1;
+let cur = 0;
+let crisisTriggered = false;
+
+// ═══════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════
+function goTo(n) {
+  document.getElementById(`step-${cur}`).classList.remove('active');
+  cur = n;
+  document.getElementById(`step-${n}`).classList.add('active');
+  updateBar();
+  window.scrollTo({ top:0, behavior:'smooth' });
+  if (n >= 2 && n <= 7) buildDomain(n);
+}
+
+function updateBar() {
+  const pct = Math.round((cur/8)*100);
+  document.getElementById('progBar').style.width = pct+'%';
+  const labels = ['Intro','Child Info','Emotional','Behaviour','Attention','Social','Language','Safety','Results'];
+  document.getElementById('stepLabel').textContent = labels[cur] || '';
+}
+
+// ═══════════════════════════════════
+// AGE AUTO-DETECT
+// ═══════════════════════════════════
+function autoStage() {
+  const v = document.getElementById('dob').value;
+  if (!v) return;
+  const age = Math.floor((Date.now() - new Date(v)) / 31557600000);
+  if (age < 0) return;
+  document.getElementById('ageTag').textContent = `(${age} yrs)`;
+  const sel = document.getElementById('ageGroup');
+  if      (age <= 2)  sel.value = '0';
+  else if (age <= 5)  sel.value = '1';
+  else if (age <= 9)  sel.value = '2';
+  else if (age <= 12) sel.value = '3';
+  else                sel.value = '4';
+  setStage();
+}
+function setStage() {
+  const v = document.getElementById('ageGroup').value;
+  if (v !== '') stage = parseInt(v);
+}
+
+// ═══════════════════════════════════
+// VALIDATE STEP 1
+// ═══════════════════════════════════
+function validateStep1() {
+  if (document.getElementById('ageGroup').value === '') {
+    alert('Please select an age group to continue.'); return;
+  }
+  stage = parseInt(document.getElementById('ageGroup').value);
+  goTo(2);
+}
+
+// ═══════════════════════════════════
+// BUILD DOMAIN STEP
+// ═══════════════════════════════════
+function buildDomain(stepNum) {
+  const dom = DOMAINS[stepNum - 2];
+  const questions = BANK[dom.key][stage];
+  const s = STAGES[stage];
+
+  let html = `<div class="card">
+    <div class="section-head">
+      <div class="s-num">${dom.icon}</div>
+      <div>
+        <div class="s-title">${dom.label}</div>
+        <div class="s-sub">Think about your child's behaviour over the <strong>past 4 weeks</strong></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="stage-banner">
+        <span class="stage-icon">${s.icon}</span>
+        <div>
+          <div class="stage-label">${s.name} · ${s.range}</div>
+          <div class="stage-range">Questions adapted for this developmental stage</div>
+          ${stepNum===7 ? '<div class="stage-note">⚠️ This section asks about safety. Please answer honestly — your child\'s wellbeing is the priority.</div>' : ''}
+        </div>
+      </div>`;
+
+  questions.forEach((item, idx) => {
+    const sc = SCALES[item.s];
+    const nm = `${dom.key}_q${idx}`;
+    const isCrisis = item.crisis || false;
+    const cols = sc.labels.length;
+
+    html += `<div class="q-block${isCrisis ? ' safety' : ''}">
+      <div class="q-text">${idx+1}. ${item.q}</div>
+      <div class="rating-row r${cols}">`;
+
+    sc.labels.forEach((lbl, val) => {
+      html += `<div class="r-opt">
+        <input type="radio" name="${nm}" id="${nm}_${val}" value="${val}"
+          ${isCrisis ? `onchange="checkCrisis('${nm}',${val})"` : ''}>
+        <label for="${nm}_${val}"><span class="rv">${val}</span>${lbl}</label>
+      </div>`;
+    });
+
+    html += `</div>`;
+    if (isCrisis) {
+      html += `<div class="safety-alert" id="alert_${nm}">
+        <strong>⚠️ This requires immediate attention.</strong>
+        Please reach out to a mental health professional as soon as possible. Do not wait for the screening results.
+        <br><br>📞 <strong>iCall (TISS):</strong> 9152987821 &nbsp;|&nbsp; <strong>Vandrevala Foundation:</strong> 1860-2662-345 (24/7) &nbsp;|&nbsp; <strong>NIMHANS Helpline:</strong> 080-46110007
+      </div>`;
+    }
+    html += `</div>`;
+  });
+
+  const prevStep = stepNum - 1;
+  const nextStep = stepNum + 1;
+  const isLast = stepNum === 7;
+
+  html += `<div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(${prevStep})">← Back</button>
+    <button class="btn btn-primary" onclick="${isLast ? 'computeResults()' : `goTo(${nextStep})`}">
+      ${isLast ? 'View Results →' : 'Continue →'}
+    </button>
+  </div>
+  </div></div>`;
+
+  document.getElementById(`s${stepNum}content`).innerHTML = html;
+}
+
+// ═══════════════════════════════════
+// CRISIS CHECK
+// ═══════════════════════════════════
+function checkCrisis(nm, val) {
+  const el = document.getElementById(`alert_${nm}`);
+  if (el) {
+    el.style.display = val > 0 ? 'block' : 'none';
+    if (val > 0) crisisTriggered = true;
+  }
+}
+
+// ═══════════════════════════════════
+// SCORE
+// ═══════════════════════════════════
+function scoreFor(domKey) {
+  const qs = BANK[domKey][stage];
+  let raw = 0, max = 0;
+  qs.forEach((item, idx) => {
+    const sc = SCALES[item.s];
+    max += sc.max;
+    const sel = document.querySelector(`input[name="${domKey}_q${idx}"]:checked`);
+    if (sel) raw += parseInt(sel.value);
+  });
+  return { raw, max, pct: max > 0 ? Math.round((raw/max)*100) : 0 };
+}
+
+// ═══════════════════════════════════
+// COMPUTE & RENDER RESULTS
+// ═══════════════════════════════════
+function computeResults() {
+  const child = document.getElementById('childName').value || 'Your child';
+  const stageName = STAGES[stage]?.name || '';
+  document.getElementById('resSub').textContent = `${child} · ${stageName}`;
+
+  const scores = {};
+  let totalRaw = 0, totalMax = 0;
+  DOMAINS.forEach(d => {
+    scores[d.key] = scoreFor(d.key);
+    if (d.key !== 'safety') { totalRaw += scores[d.key].raw; totalMax += scores[d.key].max; }
+  });
+  const overall = totalMax > 0 ? Math.round((totalRaw/totalMax)*100) : 0;
+
+  // Domain rows
+  let rowsHtml = '';
+  DOMAINS.forEach(d => {
+    const sc = scores[d.key];
+    let fillCls = 'fill-low', tagCls = 'tag-low', tagTxt = 'Low concern';
+    if (d.key === 'safety') {
+      fillCls = sc.raw > 0 ? 'fill-high' : 'fill-low';
+      tagCls  = sc.raw > 0 ? 'tag-flag'  : 'tag-safe';
+      tagTxt  = sc.raw > 0 ? 'Flag raised': 'No flag';
+    } else {
+      if (sc.pct >= 60) { fillCls='fill-high'; tagCls='tag-high'; tagTxt='High concern'; }
+      else if (sc.pct >= 35) { fillCls='fill-mid'; tagCls='tag-mid'; tagTxt='Moderate'; }
+    }
+    rowsHtml += `<div class="domain-row">
+      <div class="domain-name">${d.icon} ${d.label}</div>
+      <div class="bar-wrap">
+        <div class="bar-track"><div class="bar-fill ${fillCls}" style="width:0%" data-pct="${sc.pct}"></div></div>
+        <div class="bar-pct">${sc.raw}/${sc.max}</div>
+      </div>
+      <div class="domain-tag ${tagCls}">${tagTxt}</div>
+    </div>`;
+  });
+  document.getElementById('domainRows').innerHTML = rowsHtml;
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => el.style.width = el.dataset.pct+'%');
+  }, 100);
+
+  // Triage
+  const highDoms = DOMAINS.filter(d => d.key !== 'safety' && scores[d.key].pct >= 60);
+  const midDoms  = DOMAINS.filter(d => d.key !== 'safety' && scores[d.key].pct >= 35 && scores[d.key].pct < 60);
+  let triageHtml = '', recsHtml = '';
+
+  if (crisisTriggered || scores.safety.raw > 0) {
+    triageHtml = `<div class="triage-card triage-high">
+      <h3>⚠️ Immediate Safety Concern</h3>
+      <p>One or more safety indicators were raised. Please seek professional help immediately — do not wait for further results.</p>
+    </div>`;
+    recsHtml += `<div class="rec-item"><span class="rec-icon">🚨</span><div><strong>Seek immediate professional support.</strong> Contact a child mental health professional today. Helplines: iCall 9152987821 · Vandrevala 1860-2662-345 (24/7) · NIMHANS 080-46110007</div></div>`;
+  } else if (highDoms.length >= 2 || overall >= 55) {
+    triageHtml = `<div class="triage-card triage-high">
+      <h3>High Concern</h3>
+      <p>Multiple developmental areas show elevated scores. A comprehensive evaluation by a qualified child psychologist is strongly recommended.</p>
+    </div>`;
+    recsHtml += `<div class="rec-item"><span class="rec-icon">🔴</span><div><strong>Seek a professional evaluation.</strong> Refer to an RCI-registered psychologist or child development specialist for a comprehensive assessment at the earliest.</div></div>`;
+  } else if (midDoms.length >= 1 || overall >= 30) {
+    triageHtml = `<div class="triage-card triage-mid">
+      <h3>Moderate Concern</h3>
+      <p>Some developmental areas show scores worth discussing with a professional. A consultation is recommended.</p>
+    </div>`;
+    recsHtml += `<div class="rec-item"><span class="rec-icon">🟡</span><div><strong>Consult your child's school counsellor or a psychologist.</strong> Share these results and discuss appropriate next steps for your child.</div></div>`;
+  } else {
+    triageHtml = `<div class="triage-card triage-low">
+      <h3>Low Concern</h3>
+      <p>Scores are within expected ranges for this age group. Continue monitoring your child's wellbeing and rescreen in 6 months if any concerns arise.</p>
+    </div>`;
+    recsHtml += `<div class="rec-item"><span class="rec-icon">🟢</span><div><strong>Continue regular monitoring.</strong> Maintain open conversations with your child and repeat this screening in 6 months or sooner if concerns arise.</div></div>`;
+  }
+
+  // Domain-specific recommendations
+  const domRecs = {
+    emotional: "An assessment for anxiety or mood concerns by a child psychologist would be beneficial.",
+    behaviour: "Discuss behaviour patterns with your child's school counsellor and paediatrician. A behavioural assessment may be helpful.",
+    attention: "Consider an evaluation for ADHD or related learning difficulties with an RCI-registered psychologist.",
+    social:    "Social skills support or an occupational therapy assessment may be beneficial. Discuss with your child's school.",
+    language:  "A formal literacy and speech-language assessment is recommended. Ask your school about learning support resources.",
+  };
+  highDoms.forEach(d => {
+    if (domRecs[d.key]) recsHtml += `<div class="rec-item"><span class="rec-icon">📋</span><div><strong>${d.label}:</strong> ${domRecs[d.key]}</div></div>`;
+  });
+
+  recsHtml += `<div class="rec-item"><span class="rec-icon">🗓️</span><div><strong>Next step:</strong> Connect with a qualified child psychologist or development specialist for personalised guidance. Keep a record of this screening to share with them.</div></div>`;
+
+  document.getElementById('triageBox').innerHTML = triageHtml;
+  document.getElementById('recList').innerHTML = recsHtml;
+
+  goTo(8);
+}
+
+// ═══════════════════════════════════
+// RESTART
+// ═══════════════════════════════════
+function restart() {
+  stage = -1; cur = 0; crisisTriggered = false;
+  document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+  ['childName','dob','parentName'].forEach(id => document.getElementById(id).value = '');
+  ['ageGroup','gender','relation'].forEach(id => document.getElementById(id).selectedIndex = 0);
+  document.getElementById('ageTag').textContent = '';
+  for (let i=2; i<=7; i++) document.getElementById(`s${i}content`).innerHTML = '';
+  document.getElementById('progBar').style.width = '0%';
+  goTo(0);
+}
+</script>
+</body>
+</html>

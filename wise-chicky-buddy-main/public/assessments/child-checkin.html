@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wise Chicky – Feelings Check-in</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#1D9E75;--pl:#E1F5EE;--pm:#5DCAA5;--pd:#085041;
+  --a:#534AB7;--al:#EEEDFE;
+  --w:#A32D2D;--wl:#FCEBEB;--wb:#F09595;
+  --am:#BA7517;--aml:#FAEEDA;--amb:#FAC775;
+  --sun:#FFD166;--sky:#EAF6FF;--leaf:#B7EDDA;
+  --bg:#F7FBF9;
+  --card:#FFFFFF;
+  --tx:#1A2E26;--tm:#5A7A6E;
+  --bd:#D5EAE2;--bds:#B7EDDA;
+  --r:18px;--rm:12px;
+}
+html,body{height:100%;background:var(--bg);font-family:'Nunito Sans',sans-serif;color:var(--tx)}
+
+/* ── LAYOUT ── */
+#shell{max-width:480px;margin:0 auto;padding:0 0 40px;min-height:100vh;position:relative}
+#app{padding:0 1.1rem;padding-top:0}
+
+/* ── JOURNEY MAP ── */
+#journey-bar{
+  background:linear-gradient(135deg,#1D9E75 0%,#085041 100%);
+  padding:1rem 1.1rem 0;
+  border-radius:0 0 28px 28px;
+  margin-bottom:1.25rem;
+  overflow:hidden;
+  position:relative;
+}
+#journey-bar::before{
+  content:'';position:absolute;top:-30px;right:-20px;
+  width:120px;height:120px;border-radius:50%;
+  background:rgba(255,255,255,.07);
+}
+.jb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.jb-title{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.02em}
+.jb-pct{font-size:12px;font-weight:600;color:rgba(255,255,255,.7)}
+.journey-path{display:flex;align-items:flex-end;gap:0;padding-bottom:1rem;position:relative;overflow-x:auto;scrollbar-width:none}
+.journey-path::-webkit-scrollbar{display:none}
+.stop{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;position:relative;z-index:1;width:72px}
+.stop-connector{flex:1;height:3px;background:rgba(255,255,255,.2);margin-bottom:20px;border-radius:2px;transition:background .4s}
+.stop-connector.done{background:var(--sun)}
+.stop-ico{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;border:2px solid rgba(255,255,255,.2);
+  transition:all .35s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+.stop.active .stop-ico{
+  background:var(--sun);border-color:var(--sun);
+  transform:scale(1.15);
+  box-shadow:0 0 0 6px rgba(255,209,102,.25);
+}
+.stop.done .stop-ico{background:rgba(255,255,255,.9);border-color:white}
+.stop-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.6);text-align:center;line-height:1.2;letter-spacing:.02em}
+.stop.active .stop-lbl{color:var(--sun)}
+.stop.done .stop-lbl{color:rgba(255,255,255,.85)}
+
+/* ── CHICK ── */
+#chick-wrap{text-align:center;margin:1.25rem 0 1rem;animation:chickIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes chickIn{from{transform:scale(0) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+#chick{font-size:64px;display:inline-block;transition:transform .3s}
+#chick.nod{animation:nod .4s ease}
+@keyframes nod{0%{transform:rotate(0)}25%{transform:rotate(-12deg)}75%{transform:rotate(10deg)}100%{transform:rotate(0)}}
+#chick.bounce{animation:bounce .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bounce{0%{transform:scale(1)}40%{transform:scale(1.25)}70%{transform:scale(.92)}100%{transform:scale(1)}}
+.chick-bubble{
+  display:inline-block;background:white;border:1.5px solid var(--bd);
+  border-radius:16px 16px 16px 4px;
+  padding:.5rem .875rem;font-size:13px;color:var(--tm);
+  font-weight:500;margin-top:.4rem;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  animation:bubbleIn .3s ease;
+  max-width:260px;line-height:1.45;
+}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SCREENS ── */
+.scr{animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── WELCOME ── */
+.hero{text-align:center;padding:1.25rem 0 .875rem}
+.hero-h{font-family:'Nunito',sans-serif;font-size:24px;font-weight:800;color:var(--tx);margin-bottom:.4rem}
+.hero-s{font-size:14px;color:var(--tm);line-height:1.65;margin-bottom:1.25rem}
+.age-lbl-above{font-size:13px;color:var(--tm);text-align:center;margin-bottom:.625rem;font-weight:600}
+.age-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.age-card{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:.875rem .5rem;cursor:pointer;text-align:center;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.age-card:hover{border-color:var(--p);background:var(--pl);transform:translateY(-2px)}
+.age-card.sel{border:2.5px solid var(--p);background:var(--pl);transform:translateY(-3px);box-shadow:0 4px 16px rgba(29,158,117,.15)}
+.age-ico{font-size:28px;display:block;margin-bottom:5px}
+.age-lbl{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--tx)}
+.age-rng{font-size:11px;color:var(--tm);margin-top:2px}
+.name-wrap{margin-bottom:1.25rem}
+.name-label{font-size:13px;color:var(--tm);font-weight:600;margin-bottom:.4rem;display:block}
+.name-input{
+  width:100%;padding:.65rem 1rem;border:1.5px solid var(--bd);border-radius:var(--rm);
+  font-family:'Nunito Sans',sans-serif;font-size:15px;color:var(--tx);background:var(--card);
+  outline:none;transition:border-color .2s;
+}
+.name-input:focus{border-color:var(--p)}
+
+/* ── QUESTION ── */
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+.qctr{font-size:13px;color:var(--tm);font-weight:600}
+.qpct{font-size:12px;color:var(--tm)}
+.pbar-wrap{background:var(--bd);border-radius:99px;height:6px;margin-bottom:1.1rem;overflow:hidden}
+.pbar-fill{height:6px;background:linear-gradient(90deg,var(--pm),var(--p));border-radius:99px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.sec-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--pl);color:var(--pd);
+  font-size:12px;font-weight:700;padding:4px 12px;border-radius:99px;
+  margin-bottom:.875rem;letter-spacing:.02em;
+}
+.q-txt{font-family:'Nunito',sans-serif;font-size:18px;font-weight:700;color:var(--tx);margin-bottom:1.1rem;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:9px;margin-bottom:1.5rem}
+.opt-btn{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:.8rem 1rem;cursor:pointer;text-align:left;
+  font-family:'Nunito Sans',sans-serif;font-size:14px;color:var(--tx);
+  transition:all .18s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;gap:11px;line-height:1.4;font-weight:500;
+}
+.opt-btn:hover{border-color:var(--p);background:var(--pl);transform:translateX(3px)}
+.opt-btn.sel{
+  border:2px solid var(--p);background:var(--pl);
+  transform:translateX(3px);
+  box-shadow:0 2px 10px rgba(29,158,117,.12);
+}
+.opt-dot{
+  width:20px;height:20px;border-radius:50%;border:1.5px solid var(--bd);
+  flex-shrink:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.opt-btn.sel .opt-dot{background:var(--p);border-color:var(--p)}
+.opt-btn.sel .opt-dot::after{content:'✓';font-size:11px;color:white;font-weight:700}
+.emoji-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.5rem}
+.emoji-opt{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:.875rem .5rem;cursor:pointer;text-align:center;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center;gap:5px;
+}
+.emoji-opt:hover{border-color:var(--p);background:var(--pl);transform:translateY(-2px)}
+.emoji-opt.sel{border:2.5px solid var(--p);background:var(--pl);transform:translateY(-3px);box-shadow:0 4px 12px rgba(29,158,117,.15)}
+.emoji-face{font-size:28px}
+.emoji-lbl{font-size:10px;font-weight:600;color:var(--tm);line-height:1.2}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
+.btn{
+  padding:.65rem 1.4rem;border-radius:var(--rm);font-size:14px;cursor:pointer;
+  border:1.5px solid var(--bd);background:var(--card);color:var(--tx);
+  font-family:'Nunito',sans-serif;font-weight:700;
+  transition:all .15s;
+}
+.btn:hover{background:var(--pl);border-color:var(--p)}
+.btn-p{background:var(--p);color:white;border-color:var(--p);box-shadow:0 3px 12px rgba(29,158,117,.3)}
+.btn-p:hover{background:var(--pd);border-color:var(--pd);box-shadow:0 4px 16px rgba(29,158,117,.4)}
+.btn:disabled{opacity:.38;cursor:default;transform:none!important}
+
+/* ── ALERTS ── */
+.alert{border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1rem;font-size:14px;line-height:1.65;font-weight:500}
+.alert-r{background:var(--wl);border:1.5px solid var(--wb);color:var(--w)}
+.alert-a{background:var(--aml);border:1.5px solid var(--amb);color:var(--am)}
+.alert-g{background:var(--pl);border:1.5px solid var(--pm);color:var(--pd)}
+.safe-box{background:var(--wl);border:1.5px solid var(--wb);border-radius:var(--r);padding:1rem 1.1rem;margin-bottom:1.1rem;font-size:13px;color:var(--w);line-height:1.65}
+.safe-box strong{font-weight:700}
+
+/* ── RESULTS ── */
+.rc{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:1rem 1.1rem;margin-bottom:10px;
+  animation:slideIn .35s ease both;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.rc:nth-child(1){animation-delay:.05s}
+.rc:nth-child(2){animation-delay:.12s}
+.rc:nth-child(3){animation-delay:.19s}
+.rc:nth-child(4){animation-delay:.26s}
+.rc-lbl{font-size:11px;color:var(--tm);margin-bottom:5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.rc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.rc-name{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--tx)}
+.rc-lvl{font-size:12px;font-weight:700}
+.bw{background:var(--bd);border-radius:99px;height:8px;overflow:hidden}
+.bf{height:8px;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bf-g{background:linear-gradient(90deg,var(--pm),var(--p))}
+.bf-a{background:linear-gradient(90deg,#FAC775,#EF9F27)}
+.bf-r{background:linear-gradient(90deg,#F09595,#E24B4A)}
+.chip{display:inline-block;background:var(--al);color:var(--a);font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;letter-spacing:.03em}
+.info-box{background:var(--pl);border-radius:var(--rm);padding:.875rem 1rem;font-size:13px;color:var(--pd);line-height:1.65;font-weight:500}
+.info-box strong{color:var(--pd);font-weight:700}
+
+/* ── BADGES ── */
+.badges-wrap{display:flex;gap:10px;justify-content:center;margin:1.25rem 0}
+.badge{
+  background:var(--card);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:.75rem;text-align:center;flex:1;
+  animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.badge:nth-child(1){animation-delay:.3s}
+.badge:nth-child(2){animation-delay:.5s}
+.badge:nth-child(3){animation-delay:.7s}
+@keyframes badgePop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.badge-ico{font-size:28px;display:block;margin-bottom:4px}
+.badge-name{font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;color:var(--p);letter-spacing:.03em}
+.badge-desc{font-size:10px;color:var(--tm);margin-top:2px}
+
+/* ── CRISIS ── */
+.crisis-card{background:var(--wl);border:2px solid var(--wb);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem}
+.crisis-card h3{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--w);margin-bottom:.625rem}
+.crisis-item{font-size:14px;color:var(--w);line-height:1.6;padding:.2rem 0}
+.crisis-item::before{content:'→ ';font-weight:700}
+
+/* ── SECTION COMPLETE ── */
+.sec-complete{text-align:center;padding:1.5rem 0}
+.sec-complete-ico{font-size:56px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0) rotate(-15deg)}to{transform:scale(1) rotate(0)}}
+.sec-complete-h{font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--tx);margin:.5rem 0 .25rem}
+.sec-complete-s{font-size:14px;color:var(--tm)}
+.stars{display:flex;justify-content:center;gap:4px;margin:.75rem 0}
+.star{font-size:22px;animation:starPop .3s cubic-bezier(.34,1.56,.64,1) both}
+.star:nth-child(1){animation-delay:.1s}
+.star:nth-child(2){animation-delay:.22s}
+.star:nth-child(3){animation-delay:.34s}
+@keyframes starPop{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+/* ── MISC ── */
+.divider{font-size:11px;font-weight:700;color:var(--tm);letter-spacing:.08em;text-transform:uppercase;padding:.625rem 0;border-bottom:1.5px solid var(--bd);margin-bottom:1rem}
+
+/* ── CONFETTI (CSS only) ── */
+.confetti-wrap{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden}
+.conf{position:absolute;top:-10px;width:8px;height:8px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="journey-bar" style="display:none" id="jbar"></div>
+  <div id="app"></div>
+</div>
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+
+const AGES=[
+  {id:'young',lbl:'Little One',rng:'Ages 6–8',ico:'🌱'},
+  {id:'middle',lbl:'Explorer',rng:'Ages 9–12',ico:'🌟'},
+  {id:'teen',lbl:'Teen',rng:'Ages 13–17',ico:'🌊'}
+];
+
+const SECTIONS=[
+  {id:'depression',lbl:'Mood & Feelings',ico:'💛',stop:'Morning Valley',src:'PHQ-A',
+   chickMsg:{young:"Let's talk about how you've been feeling 🌤️",middle:"Tell me about your mood lately 💛",teen:"How have you been feeling recently?"}},
+  {id:'anxiety',lbl:'Worries',ico:'💭',stop:'Thinking Cloud',src:'GAD-7',
+   chickMsg:{young:"Now let's talk about worries — everyone has them! 💭",middle:"Let's explore your worries together 💭",teen:"Let's talk about anxiety and worry."}},
+  {id:'wellbeing',lbl:'About Yourself',ico:'🌈',stop:'Mirror Lake',src:'WC-Original',
+   chickMsg:{young:"Now tell me how you feel about YOU 🌈",middle:"These questions are about how you see yourself 🌈",teen:"Let's think about how you feel about yourself."}},
+  {id:'safety',lbl:'Important Questions',ico:'💚',stop:'Safe Clearing',src:'ASQ/NIMH',
+   chickMsg:{young:"These are very important questions. Be honest — you're safe here 💚",middle:"These are serious questions. Please answer honestly 💚",teen:"These are important questions. Your honesty helps us support you."}}
+];
+
+const QS=[
+  // ── DEPRESSION (PHQ-A) ──
+  {id:'d1',sec:'depression',
+   young:'In the last two weeks, did you feel sad or unhappy most of the time?',
+   middle:'In the past two weeks, did you feel sad, unhappy, or like things were hopeless?',
+   teen:'Over the last 2 weeks — feeling down, depressed, irritable, or hopeless?',
+   opts:[
+     {y:'No, I felt okay 😊',m:'Not at all',t:'Not at all',v:0},
+     {y:'A little bit 🙂',m:'Several days',t:'Several days',v:1},
+     {y:'Lots of days 😔',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day 😞',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d2',sec:'depression',
+   young:'Did you stop enjoying things that are usually fun for you?',
+   middle:'Did you stop enjoying things you usually like — games, friends, hobbies?',
+   teen:'Little interest or pleasure in doing things?',
+   opts:[
+     {y:'No, things were still fun',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Most days',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d3',sec:'depression',
+   young:'Did you feel very tired and not want to do anything?',
+   middle:'Did you feel tired or like you had no energy, even without doing much?',
+   teen:'Feeling tired or having little energy?',
+   opts:[
+     {y:'No',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d4',sec:'depression',
+   young:'Did you have trouble sleeping — staying asleep or sleeping too much?',
+   middle:'Did you have trouble falling asleep, staying asleep, or sleep way too much?',
+   teen:'Trouble falling or staying asleep, or sleeping too much?',
+   opts:[
+     {y:'No, I slept fine',m:'Not at all',t:'Not at all',v:0},
+     {y:'Some nights',m:'Several days',t:'Several days',v:1},
+     {y:'Most nights',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every night',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d5',sec:'depression',
+   young:'Did you feel bad about yourself, like you were a bad kid or did everything wrong?',
+   middle:'Did you feel bad about yourself, or like you let yourself or your family down?',
+   teen:'Feeling bad about yourself — or that you are a failure or have let yourself or your family down?',
+   opts:[
+     {y:'No',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d6',sec:'depression',
+   young:'Was it hard for you to focus or pay attention in school?',
+   middle:'Did you have trouble concentrating on schoolwork or things you were doing?',
+   teen:'Trouble concentrating on things like school work, reading, or watching TV?',
+   opts:[
+     {y:'No, I could focus fine',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d7',sec:'depression',
+   young:'Did you eat much less or much more than usual?',
+   middle:'Did your appetite change a lot — eating too little or too much?',
+   teen:'Poor appetite, weight loss, or overeating?',
+   opts:[
+     {y:'No, I ate normally',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'d8',sec:'depression',
+   young:'Were you moving around a LOT more than usual, or the opposite — moving really slowly?',
+   middle:'Were you way more restless and fidgety than usual, or did you move and speak much more slowly?',
+   teen:'Moving or speaking so slowly others noticed — or the opposite, being fidgety or restless much more than usual?',
+   opts:[
+     {y:'No, same as usual',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  // ── ANXIETY (GAD-7) ──
+  {id:'a1',sec:'anxiety',
+   young:'Do you feel nervous, worried, or scared inside — even when nothing bad is happening?',
+   middle:'Do you feel nervous, anxious, or on edge a lot?',
+   teen:'Feeling nervous, anxious, or on edge?',
+   opts:[
+     {y:'Not really',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'a2',sec:'anxiety',
+   young:'Do you worry a lot about lots of different things?',
+   middle:'Do you worry too much about all kinds of different things?',
+   teen:'Not being able to stop or control worrying?',
+   opts:[
+     {y:'Not really',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'a3',sec:'anxiety',
+   young:'Is it really hard for you to calm down and relax?',
+   middle:'Do you have trouble relaxing, even when you want to?',
+   teen:'Trouble relaxing?',
+   opts:[
+     {y:'No, I can relax',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'a4',sec:'anxiety',
+   young:'Do you feel so restless that sitting still feels impossible?',
+   middle:'Do you feel so restless that it\'s hard to sit still?',
+   teen:'Being so restless that it is hard to sit still?',
+   opts:[
+     {y:'No',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'a5',sec:'anxiety',
+   young:'Do you get annoyed or upset very easily, more than other kids?',
+   middle:'Do you get irritable or easily annoyed — more than usual?',
+   teen:'Becoming easily annoyed or irritable?',
+   opts:[
+     {y:'Not really',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  {id:'a6',sec:'anxiety',
+   young:'Do you sometimes feel scared that something bad is about to happen?',
+   middle:'Do you feel afraid, like something awful might happen?',
+   teen:'Feeling afraid, as if something awful might happen?',
+   opts:[
+     {y:'Not really',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Several days',t:'Several days',v:1},
+     {y:'Often',m:'More than half the days',t:'More than half the days',v:2},
+     {y:'Almost every day',m:'Nearly every day',t:'Nearly every day',v:3}
+   ]},
+  // ── WELLBEING (WC-Original) ──
+  {id:'w1',sec:'wellbeing',
+   young:'Do you feel lonely or like no one wants to be your friend?',
+   middle:'Do you feel lonely or like kids around you don\'t want to spend time with you?',
+   teen:'Have you been feeling lonely or like people don\'t want to be around you?',
+   opts:[
+     {y:'No, I have friends',m:'Not at all',t:'Not at all',v:0},
+     {y:'Sometimes',m:'Sometimes',t:'Several days',v:1},
+     {y:'A lot',m:'Often',t:'More than half the days',v:2},
+     {y:'Almost always',m:'Almost always',t:'Nearly every day',v:3}
+   ]},
+  {id:'w2',sec:'wellbeing',
+   young:'Do you feel like you\'re not as good as the other kids?',
+   middle:'Do you feel like you could never be as good as other kids?',
+   teen:'Have you felt like you could never measure up to others around you?',
+   opts:[
+     {y:'No, I\'m good enough',m:'Not true',t:'Not at all',v:0},
+     {y:'Sometimes I think that',m:'Sometimes',t:'Several days',v:1},
+     {y:'I think that a lot',m:'Often',t:'More than half the days',v:2},
+     {y:'Almost always',m:'Almost always',t:'Nearly every day',v:3}
+   ]},
+  {id:'w3',sec:'wellbeing',
+   young:'Do you feel like nobody in your family really loves you?',
+   middle:'Do you feel like nobody really loves or cares about you?',
+   teen:'Have you felt like nobody really loves or cares about you?',
+   opts:[
+     {y:'No, my family loves me',m:'Not true',t:'Not at all',v:0},
+     {y:'Sometimes I feel that way',m:'Sometimes',t:'Several days',v:1},
+     {y:'I feel that way a lot',m:'Often',t:'Most of the time',v:2},
+     {y:'Almost always',m:'Almost always',t:'Nearly every day',v:3}
+   ]},
+  // ── SAFETY (ASQ/NIMH) ──
+  {id:'s1',sec:'safety',isSafety:true,
+   young:'Have you ever felt like you wished you weren\'t here, or like you wanted to hurt yourself?',
+   middle:'In the past few weeks, have you wished you were dead or not here anymore?',
+   teen:'In the past few weeks, have you wished you were dead?',
+   opts:[{y:'No',m:'No',t:'No',v:0},{y:'Yes',m:'Yes',t:'Yes',v:1}]},
+  {id:'s2',sec:'safety',isSafety:true,
+   young:'Have you ever thought about hurting yourself on purpose?',
+   middle:'In the past few weeks, have you felt like your family would be better off without you?',
+   teen:'In the past few weeks, have you felt that you or your family would be better off if you were dead?',
+   opts:[{y:'No',m:'No',t:'No',v:0},{y:'Yes',m:'Yes',t:'Yes',v:1}]},
+  {id:'s3',sec:'safety',isSafety:true,
+   young:'Right now, are you thinking about hurting yourself?',
+   middle:'In the past week, have you been having thoughts about hurting yourself?',
+   teen:'In the past week, have you been having thoughts about killing yourself?',
+   opts:[{y:'No',m:'No',t:'No',v:0},{y:'Yes',m:'Yes',t:'Yes',v:1}]},
+  {id:'s4',sec:'safety',isSafety:true,
+   young:'Have you ever actually tried to hurt yourself before?',
+   middle:'Have you ever tried to hurt yourself on purpose?',
+   teen:'Have you ever tried to kill yourself?',
+   opts:[{y:'No',m:'No',t:'No',v:0},{y:'Yes',m:'Yes',t:'Yes',v:1}]}
+];
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let S={
+  screen:'welcome', // welcome|q|secComplete|crisis|results
+  age:null, name:'',
+  qi:0, ans:{},
+  safetyHit:false, acuteHit:false, _shownCrisis:false,
+  completedSecs:new Set(),
+  showingSecComplete:null,
+};
+
+// ── HELPERS ─────────────────────────────────────────────────────────────────
+const a=id=>document.getElementById(id);
+const txt=(q,age)=>q[age==='young'?'young':age==='middle'?'middle':'teen'];
+const oTxt=(o,age)=>o[age==='young'?'y':age==='middle'?'m':'t'];
+const curQ=()=>QS[S.qi];
+const curSec=()=>SECTIONS.find(s=>s.id===curQ().sec);
+const isLast=()=>S.qi===QS.length-1;
+const pct=()=>Math.round((Object.keys(S.ans).length/QS.length)*100);
+const nameOf=()=>S.name||'friend';
+
+function secQs(secId){return QS.filter(q=>q.sec===secId)}
+function secDone(secId){return secQs(secId).every(q=>S.ans[q.id]!==undefined)}
+function isLastInSec(qi){
+  let q=QS[qi];
+  let qs=secQs(q.sec);
+  return qs[qs.length-1].id===q.id;
+}
+
+function scores(){
+  let r={};
+  SECTIONS.forEach(sec=>{
+    let sum=0,max=0,cnt=0;
+    secQs(sec.id).forEach(q=>{
+      if(S.ans[q.id]!==undefined){
+        sum+=S.ans[q.id];
+        max+=sec.id==='safety'?1:3;
+        cnt++;
+      }
+    });
+    r[sec.id]={sum,max,cnt};
+  });
+  return r;
+}
+
+// ── CHICK ───────────────────────────────────────────────────────────────────
+const CHICK_EMOJIS={
+  welcome:'🐣',question:'🐥',thinking:'🤔',happy:'😄',safety:'🐥',crisis:'💚',results:'🎉'
+};
+let chickMsgTimeout;
+function chickSay(msg,emo){
+  let wrap=a('chick-wrap');
+  if(!wrap)return;
+  let c=a('chick');
+  if(c&&emo){c.textContent=emo;animateChick(c,'nod')}
+  let b=wrap.querySelector('.chick-bubble');
+  if(b){b.textContent=msg;b.style.animation='none';requestAnimationFrame(()=>{b.style.animation='bubbleIn .3s ease'})}
+}
+function animateChick(el,cls){
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+  setTimeout(()=>el.classList.remove(cls),600);
+}
+
+// ── JOURNEY BAR ─────────────────────────────────────────────────────────────
+function updateJourneyBar(){
+  let jb=document.getElementById('journey-bar');
+  if(S.screen==='welcome'||S.screen==='results'){jb.style.display='none';return;}
+  jb.style.display='block';
+  let curSecId=S.screen==='secComplete'?S.showingSecComplete:curQ()?.sec;
+  let secIdx=SECTIONS.findIndex(s=>s.id===curSecId);
+
+  let stopsHtml=SECTIONS.map((sec,i)=>{
+    let isDone=S.completedSecs.has(sec.id);
+    let isActive=sec.id===curSecId;
+    let cls=isDone?'stop done':isActive?'stop active':'stop';
+    let connCls=i<SECTIONS.length-1?(isDone||i<secIdx?'stop-connector done':'stop-connector'):'';
+    return`<div class="${cls}">
+      <div class="stop-ico">${isDone?'✓':sec.ico}</div>
+      <div class="stop-lbl">${sec.stop}</div>
+    </div>${i<SECTIONS.length-1?`<div class="${connCls}"></div>`:''}`;
+  }).join('');
+
+  jb.innerHTML=`
+    <div class="jb-top">
+      <div class="jb-title">🐥 ${nameOf()}'s Journey</div>
+      <div class="jb-pct">${pct()}% complete</div>
+    </div>
+    <div class="journey-path">${stopsHtml}</div>`;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function render(){
+  updateJourneyBar();
+  let app=a('app');
+  if(S.screen==='welcome')        app.innerHTML=renderWelcome();
+  else if(S.screen==='q')         app.innerHTML=renderQ();
+  else if(S.screen==='secComplete') app.innerHTML=renderSecComplete();
+  else if(S.screen==='crisis')    app.innerHTML=renderCrisis();
+  else if(S.screen==='results')   app.innerHTML=renderResults();
+  bind();
+}
+
+// ── WELCOME ──────────────────────────────────────────────────────────────────
+function renderWelcome(){
+  return`<div class="scr">
+  <div id="chick-wrap" style="margin:1.5rem 0 1rem">
+    <span id="chick" style="font-size:72px;display:block;text-align:center;animation:chickIn .6s cubic-bezier(.34,1.56,.64,1)">🐣</span>
+    <div style="text-align:center"><span class="chick-bubble">Hi! I'm Chiku 🐥 I'll be with you the whole time!</span></div>
+  </div>
+  <div class="hero">
+    <div class="hero-h">Your Feelings Check-in</div>
+    <div class="hero-s">This is a safe place to share how you've been feeling lately. Your answers are private and there are no right or wrong answers.</div>
+  </div>
+  <div style="margin-bottom:1.1rem">
+    <label class="name-label">What's your name? <span style="color:var(--tm);font-weight:400">(optional)</span></label>
+    <input class="name-input" id="name-input" type="text" placeholder="Type your name here..." value="${S.name}" maxlength="30">
+  </div>
+  <div class="age-lbl-above">How old are you?</div>
+  <div class="age-grid">
+    ${AGES.map(g=>`<div class="age-card${S.age===g.id?' sel':''}" data-age="${g.id}">
+      <span class="age-ico">${g.ico}</span>
+      <div class="age-lbl">${g.lbl}</div>
+      <div class="age-rng">${g.rng}</div>
+    </div>`).join('')}
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem">
+    <button class="btn btn-p" id="go-btn" ${!S.age?'disabled':''}>Let's go! 🐥</button>
+  </div>
+  <div class="info-box">
+    Chiku will walk with you through <strong>mood, worries, how you feel about yourself,</strong> and a few important safety questions. Takes about 5–7 minutes.<br><br>
+    Questions use PHQ-A, GAD-7, NIMH ASQ, and original Wise Chicky items.
+  </div>
+</div>`}
+
+// ── QUESTION ─────────────────────────────────────────────────────────────────
+function renderQ(){
+  let q=curQ();
+  let sec=curSec();
+  let qText=txt(q,S.age);
+  let qOpts=q.opts.filter(o=>oTxt(o,S.age)!==null&&oTxt(o,S.age)!==undefined);
+  let ans=S.ans[q.id];
+  let isSafety=q.isSafety;
+  let chickMsg=sec.chickMsg[S.age]||sec.chickMsg.teen;
+  let chickEmo=isSafety?'🐥':'🐥';
+
+  // For young age group — use emoji-enhanced options
+  let optsHtml='';
+  if(S.age==='young'&&!isSafety){
+    optsHtml=`<div class="opts">
+    ${qOpts.map(o=>`<button class="opt-btn${ans===o.v?' sel':''}" data-v="${o.v}" data-qid="${q.id}">
+      <span class="opt-dot"></span><span>${oTxt(o,S.age)}</span>
+    </button>`).join('')}
+    </div>`;
+  } else {
+    optsHtml=`<div class="opts">
+    ${qOpts.map(o=>`<button class="opt-btn${ans===o.v?' sel':''}" data-v="${o.v}" data-qid="${q.id}">
+      <span class="opt-dot"></span><span>${oTxt(o,S.age)}</span>
+    </button>`).join('')}
+    </div>`;
+  }
+
+  // Chick area — no animations on safety section
+  let chickArea=isSafety?'':`
+  <div id="chick-wrap" style="margin-bottom:1rem">
+    <span id="chick" style="font-size:48px;display:block;text-align:center">${chickEmo}</span>
+    <div style="text-align:center"><span class="chick-bubble">${chickMsg}</span></div>
+  </div>`;
+
+  let safetyNote=isSafety?`<div class="safe-box"><strong>It's okay to be honest.</strong> If you share a concern, a trusted adult will be notified so they can support you. You won't be in trouble — we just want to make sure you're safe 💚</div>`:'';
+
+  // Encouragement at midpoint
+  let midNote='';
+  if(S.qi===Math.floor(QS.length/2)&&!isSafety){
+    midNote=`<div style="text-align:center;margin-bottom:.75rem;font-size:13px;color:var(--p);font-weight:700">🌟 Halfway there, ${nameOf()}! Chiku is proud of you.</div>`;
+  }
+
+  return`<div class="scr">
+  ${chickArea}
+  <div class="qmeta">
+    <span class="qctr">Question ${S.qi+1} of ${QS.length}</span>
+    <span class="qpct">${pct()}% done</span>
+  </div>
+  <div class="pbar-wrap"><div class="pbar-fill" style="width:${pct()}%"></div></div>
+  <div class="sec-badge">${sec.ico} ${sec.lbl} <span class="chip">${sec.src}</span></div>
+  ${midNote}
+  <div class="q-txt">${qText}</div>
+  ${safetyNote}
+  ${optsHtml}
+  <div class="nav">
+    <button class="btn" id="back-btn">← Back</button>
+    <button class="btn btn-p" id="next-btn" ${ans===undefined?'disabled':''}>
+      ${isLast()?'See results 🎉':'Next →'}
+    </button>
+  </div>
+</div>`}
+
+// ── SECTION COMPLETE ─────────────────────────────────────────────────────────
+const SEC_MSGS={
+  depression:{young:"You did it! That took bravery 💛",middle:"Well done sharing your feelings 💛",teen:"Section complete — thank you for your honesty."},
+  anxiety:{young:"Amazing! Chiku is doing a happy dance 🐥",middle:"You handled that really well 💭",teen:"Worries section done. Keep going."},
+  wellbeing:{young:"You're doing SO well! 🌈",middle:"Great job — almost done now! 🌈",teen:"Self-perception section complete."},
+  safety:{young:"You were so brave. Chiku is very proud of you 💚",middle:"You did something really important today 💚",teen:"Thank you for your honesty — it matters."}
+};
+function renderSecComplete(){
+  let sec=SECTIONS.find(s=>s.id===S.showingSecComplete);
+  let msg=SEC_MSGS[sec.id]?.[S.age]||SEC_MSGS[sec.id]?.teen;
+  let nextSec=SECTIONS[SECTIONS.indexOf(sec)+1];
+  return`<div class="scr" style="padding:1.5rem 0">
+  <div class="sec-complete">
+    <div class="sec-complete-ico">${sec.ico}</div>
+    <div class="stars"><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span></div>
+    <div class="sec-complete-h">${sec.lbl} done!</div>
+    <div class="sec-complete-s">${msg}</div>
+  </div>
+  ${nextSec?`<div style="text-align:center;margin-top:.5rem;font-size:14px;color:var(--tm);font-weight:600">Next stop: ${nextSec.ico} ${nextSec.stop}</div>`:''}
+  <div style="display:flex;justify-content:center;margin-top:1.75rem">
+    <button class="btn btn-p" id="sec-continue-btn" style="padding:.75rem 2rem;font-size:15px">
+      ${nextSec?`On to ${nextSec.lbl} →`:'See my results 🎉'}
+    </button>
+  </div>
+</div>`}
+
+// ── CRISIS ───────────────────────────────────────────────────────────────────
+function renderCrisis(){
+  let age=S.age;
+  let lines=age==='young'
+    ?['Tell a parent, teacher, or any adult you trust right now','You are not in trouble — grown-ups want to help you','You don\'t have to feel this way alone']
+    :age==='middle'
+    ?['Please tell a parent, school counselor, or trusted adult today','You deserve support and you are not alone','Vandrevala Foundation Helpline: 1860-2662-345 (24/7)']
+    :['Please reach out to a trusted adult or counselor today','Vandrevala Foundation Helpline: 1860-2662-345 (24/7)','iCall: 9152987821 (Mon–Sat, 8am–10pm)'];
+  return`<div class="scr">
+  <div style="text-align:center;padding:1rem 0 .75rem">
+    <div style="font-size:56px">💚</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--tx);margin:.5rem 0 .25rem">You are not alone</div>
+    <div style="font-size:14px;color:var(--tm)">Thank you for being honest. What you shared matters.</div>
+  </div>
+  <div class="crisis-card">
+    <h3>Important — please take action</h3>
+    ${lines.map(l=>`<div class="crisis-item">${l}</div>`).join('')}
+  </div>
+  <div class="info-box" style="margin-bottom:1.5rem">
+    The rest of this check-in will still be completed so your parent or counselor gets the full picture.
+  </div>
+  <div style="display:flex;justify-content:flex-end">
+    <button class="btn btn-p" id="after-crisis-btn">Continue check-in →</button>
+  </div>
+</div>`}
+
+// ── RESULTS ──────────────────────────────────────────────────────────────────
+function renderResults(){
+  let sc=scores();
+  let depPct=sc.depression.max>0?Math.round((sc.depression.sum/sc.depression.max)*100):0;
+  let anxPct=sc.anxiety.max>0?Math.round((sc.anxiety.sum/sc.anxiety.max)*100):0;
+  let wbPct=sc.wellbeing.max>0?Math.round((sc.wellbeing.sum/sc.wellbeing.max)*100):0;
+  let safetyScore=sc.safety.sum;
+
+  let depSev=depPct<22?'Minimal':depPct<44?'Mild':depPct<67?'Moderate':'Moderately severe';
+  let anxSev=anxPct<24?'Minimal':anxPct<48?'Mild':anxPct<71?'Moderate':'Severe';
+  let overallConcern=S.safetyHit||S.acuteHit?'high':depPct>=67||anxPct>=67?'high':depPct>=44||anxPct>=48||wbPct>=50?'moderate':'low';
+
+  let summaryMsg=overallConcern==='high'
+    ?'This check-in found important concerns. Please share these results with a parent or doctor right away.'
+    :overallConcern==='moderate'
+    ?'Some areas need attention. Sharing these results with a parent or school counselor would be helpful.'
+    :'Overall things look okay. Keep checking in regularly and talk to someone if things change.';
+  let summaryClass=overallConcern==='high'?'alert-r':overallConcern==='moderate'?'alert-a':'alert-g';
+
+  function bar(pct){
+    let cls=pct<40?'bf-g':pct<65?'bf-a':'bf-r';
+    let col=pct<40?'var(--pd)':pct<65?'var(--am)':'var(--w)';
+    return{cls,col};
+  }
+  let db=bar(depPct),ab=bar(anxPct),wb2=bar(wbPct);
+
+  // Chick results message
+  let chickResultsMsg=overallConcern==='low'
+    ?`${nameOf()}, Chiku is really proud of you! 🐥🌟`
+    :overallConcern==='moderate'
+    ?`Thank you for sharing, ${nameOf()}. You're so brave 💛`
+    :`${nameOf()}, Chiku cares about you. Please show this to a grown-up 💚`;
+
+  // Badges (always awarded for completing — never score-based)
+  let badges=[
+    {ico:'🐥',name:'BRAVE CHICK',desc:'Completed the check-in'},
+    {ico:'⭐',name:'STAR SHARER',desc:'Spoke up about feelings'},
+    {ico:'💚',name:'VOICE BADGE',desc:'Your voice matters'},
+  ];
+
+  setTimeout(()=>launchConfetti(),200);
+
+  return`<div class="scr">
+  <div style="text-align:center;padding:1.25rem 0 .75rem">
+    <div style="font-size:56px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)">🎉</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--tx);margin:.5rem 0 .2rem">Check-in complete!</div>
+    <div style="font-size:14px;color:var(--tm)">${chickResultsMsg}</div>
+  </div>
+
+  <div class="badges-wrap">
+    ${badges.map(b=>`<div class="badge">
+      <span class="badge-ico">${b.ico}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    </div>`).join('')}
+  </div>
+
+  <div class="alert ${summaryClass}" style="margin-bottom:1.1rem">${summaryMsg}</div>
+  ${S.safetyHit||S.acuteHit?`<div class="alert alert-r" style="margin-bottom:1.1rem"><strong>Safety flag raised.</strong> This child indicated thoughts of self-harm or suicide. Immediate follow-up is needed.</div>`:''}
+  ${safetyScore>0&&!S.safetyHit?`<div class="alert alert-a" style="margin-bottom:1.1rem"><strong>Safety item endorsed.</strong> A trusted adult should review and follow up.</div>`:''}
+
+  <div class="divider">Domain Results</div>
+
+  <div class="rc">
+    <div class="rc-lbl">Depression Screening · PHQ-A <span class="chip">Public domain</span></div>
+    <div class="rc-row"><div class="rc-name">${depSev}</div><div class="rc-lvl" style="color:${db.col}">${depPct}% · ${sc.depression.sum}/24</div></div>
+    <div class="bw"><div class="bf ${db.cls}" style="width:${depPct}%"></div></div>
+  </div>
+  <div class="rc">
+    <div class="rc-lbl">Anxiety Screening · GAD-7 <span class="chip">Public domain</span></div>
+    <div class="rc-row"><div class="rc-name">${anxSev}</div><div class="rc-lvl" style="color:${ab.col}">${anxPct}% · ${sc.anxiety.sum}/18</div></div>
+    <div class="bw"><div class="bf ${ab.cls}" style="width:${anxPct}%"></div></div>
+  </div>
+  <div class="rc">
+    <div class="rc-lbl">Wellbeing & Self-perception · Wise Chicky <span class="chip">Your IP</span></div>
+    <div class="rc-row"><div class="rc-name">${wbPct<40?'Positive':wbPct<65?'Some concerns':'Significant concerns'}</div><div class="rc-lvl" style="color:${wb2.col}">${wbPct}%</div></div>
+    <div class="bw"><div class="bf ${wb2.cls}" style="width:${wbPct}%"></div></div>
+  </div>
+  <div class="rc">
+    <div class="rc-lbl">Safety Screen · ASQ/NIMH <span class="chip">Public domain</span></div>
+    <div class="rc-row"><div class="rc-name">${safetyScore===0?'No concerns flagged':S.acuteHit?'Acute positive screen':S.safetyHit?'Positive screen':'Item(s) endorsed'}</div>
+    <div class="rc-lvl" style="color:${safetyScore===0?'var(--pd)':'var(--w)'}">${safetyScore} of 4</div></div>
+    <div class="bw"><div class="bf ${safetyScore===0?'bf-g':'bf-r'}" style="width:${Math.round((safetyScore/4)*100)}%"></div></div>
+  </div>
+
+  <div class="info-box" style="margin-top:1rem">
+    <strong>For parents & clinicians:</strong> PHQ-A ≥10 suggests clinically significant depression; GAD-7 ≥10 suggests moderate anxiety. Any positive ASQ screen requires follow-up. This tool screens — it does not diagnose.
+  </div>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:1.25rem">
+    <button class="btn" id="restart-btn">Start over</button>
+    <button class="btn btn-p" id="share-btn">Share with parent ↗</button>
+  </div>
+</div>`}
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────────
+function launchConfetti(){
+  let colors=['#1D9E75','#FFD166','#534AB7','#E24B4A','#5DCAA5','#FAC775'];
+  let wrap=document.createElement('div');
+  wrap.className='confetti-wrap';
+  for(let i=0;i<55;i++){
+    let c=document.createElement('div');
+    c.className='conf';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration=(1.8+Math.random()*1.8)+'s';
+    c.style.animationDelay=(Math.random()*.8)+'s';
+    c.style.width=(6+Math.random()*6)+'px';
+    c.style.height=(6+Math.random()*6)+'px';
+    c.style.borderRadius=Math.random()>.5?'50%':'2px';
+    wrap.appendChild(c);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(()=>wrap.remove(),4000);
+}
+
+// ── BIND ──────────────────────────────────────────────────────────────────────
+function bind(){
+  // Age cards
+  document.querySelectorAll('.age-card').forEach(el=>el.addEventListener('click',()=>{
+    S.age=el.dataset.age;
+    let ni=a('name-input');
+    if(ni) S.name=ni.value.trim();
+    render();
+  }));
+
+  // Name input
+  let ni=a('name-input');
+  if(ni) ni.addEventListener('input',e=>S.name=e.target.value.trim());
+
+  // Go
+  let go=a('go-btn');
+  if(go) go.addEventListener('click',()=>{
+    let ni=a('name-input');
+    if(ni) S.name=ni.value.trim();
+    if(!S.age)return;
+    S.screen='q';S.qi=0;render();
+  });
+
+  // Options
+  document.querySelectorAll('.opt-btn,.emoji-opt').forEach(el=>el.addEventListener('click',()=>{
+    let qid=el.dataset.qid;
+    let v=parseInt(el.dataset.v);
+    S.ans[qid]=v;
+    let q=QS.find(x=>x.id===qid);
+    if(q?.isSafety&&v>0){
+      S.safetyHit=true;
+      if(qid==='s3'&&v>0) S.acuteHit=true;
+    }
+    // Nod chick on answer
+    let chick=a('chick');
+    if(chick) animateChick(chick,'nod');
+    render();
+  }));
+
+  // Next
+  let nxt=a('next-btn');
+  if(nxt) nxt.addEventListener('click',()=>{
+    let q=curQ();
+    // Safety crisis check
+    if(q.isSafety&&S.ans[q.id]>0&&!S._shownCrisis){
+      S._shownCrisis=true;S.screen='crisis';render();return;
+    }
+    // Last question overall
+    if(isLast()){
+      // Mark last section done
+      S.completedSecs.add(q.sec);
+      S.screen='results';render();return;
+    }
+    // End of section
+    if(isLastInSec(S.qi)){
+      S.completedSecs.add(q.sec);
+      S.showingSecComplete=q.sec;
+      S.screen='secComplete';
+      S.qi++;
+      render();return;
+    }
+    S.qi++;render();
+  });
+
+  // Back
+  let back=a('back-btn');
+  if(back) back.addEventListener('click',()=>{
+    if(S.qi>0){S.qi--;render();}
+    else{S.screen='welcome';render();}
+  });
+
+  // After crisis
+  let ac=a('after-crisis-btn');
+  if(ac) ac.addEventListener('click',()=>{
+    S.screen='q';
+    if(isLast()){S.screen='results';render();return;}
+    render();
+  });
+
+  // Section continue
+  let sc=a('sec-continue-btn');
+  if(sc) sc.addEventListener('click',()=>{
+    S.screen='q';
+    render();
+  });
+
+  // Restart
+  let rs=a('restart-btn');
+  if(rs) rs.addEventListener('click',()=>{
+    S={screen:'welcome',age:null,name:S.name,qi:0,ans:{},safetyHit:false,acuteHit:false,_shownCrisis:false,completedSecs:new Set(),showingSecComplete:null};
+    render();
+  });
+
+  // Share
+  let sh=a('share-btn');
+  if(sh) sh.addEventListener('click',()=>{
+    let sc=scores();
+    if(typeof sendPrompt==='function'){
+      sendPrompt(`A child named ${nameOf()} (age group: ${S.age}) completed the Wise Chicky feelings check-in. Results: PHQ-A depression score ${sc.depression.sum}/24, GAD-7 anxiety score ${sc.anxiety.sum}/18, wellbeing score ${sc.wellbeing.sum}/9, safety items endorsed: ${sc.safety.sum}/4, acute safety flag: ${S.acuteHit}, any safety flag: ${S.safetyHit}. Please give me a parent-friendly plain-language summary and recommended next steps.`);
+    }
+  });
+}
+
+render();
+</script>
+</body>
+</html>
