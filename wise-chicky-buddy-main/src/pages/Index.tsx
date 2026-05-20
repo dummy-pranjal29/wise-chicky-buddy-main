@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Splash from "@/components/Splash";
 import BottomNav, { TabKey } from "@/components/app/BottomNav";
@@ -12,112 +12,106 @@ import RoleSelection from "@/components/onboarding/RoleSelection";
 import { RoleKey } from "@/data/roles";
 import Auth from "./Auth";
 import { supabase } from "@/integrations/supabase/client";
-import { clearSavedRole, getSavedRole } from "@/lib/role";
-import { useEffect } from "react";
 
 type Phase = "splash" | "vision" | "role" | "auth" | "app";
 
 const Index = () => {
   const [phase, setPhase] = useState<Phase>("splash");
   const [tab, setTab] = useState<TabKey>("vision");
-  const [role, setRole] = useState<RoleKey | null>(() => getSavedRole());
-  const [pendingRole, setPendingRole] = useState<RoleKey | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleKey | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
 
+  // Check auth status on mount
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setSessionChecked(true);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (_event, nextSession) => {
+        setSession(nextSession);
+      },
+    );
 
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const goToNextPhase = () => {
+  // Phase progression logic
+  useEffect(() => {
     if (!sessionChecked) return;
-    if (session && role) {
+
+    // If user is authenticated, go to app
+    if (session && selectedRole) {
       setPhase("app");
       return;
     }
-    if (phase === "splash") {
+
+    // If splash is done, progress through onboarding
+    if (splashDone && phase === "splash") {
       setPhase("vision");
       return;
     }
-    if (!session && role) {
-      setPhase("auth");
-      return;
-    }
-    if (!pendingRole) {
+
+    // If user hasn't selected role, show role selection
+    if (!selectedRole && phase !== "splash" && phase !== "vision") {
       setPhase("role");
       return;
     }
-    setPhase("auth");
-  };
 
-  useEffect(() => {
-    if (!sessionChecked) return;
-    if (splashDone && phase === "splash") goToNextPhase();
-    if (phase === "app" && !session) setPhase("auth");
-    if (phase === "auth" && session && role) setPhase("app");
-  }, [sessionChecked, splashDone, phase, session, role, pendingRole]);
+    // If user is not authenticated and has selected role, show auth
+    if (!session && selectedRole && phase === "role") {
+      setPhase("auth");
+      return;
+    }
+
+    // If user logs out, return to auth
+    if (!session && phase === "app") {
+      setPhase("auth");
+      return;
+    }
+  }, [sessionChecked, splashDone, phase, session, selectedRole]);
 
   const completeSplash = () => {
     setSplashDone(true);
-    goToNextPhase();
   };
 
-  const selectRole = (nextRole: RoleKey) => {
-    setPendingRole(nextRole);
-    setTab("home");
-    setPhase("auth");
-  };
-
-  const completeVision = () => {
-    goToNextPhase();
-  };
-
-  const changeRole = () => {
-    clearSavedRole();
-    setRole(null);
-    setTab("home");
-    setPhase("role");
+  const selectRole = (role: RoleKey) => {
+    setSelectedRole(role);
   };
 
   const handleAuthenticated = () => {
-    const savedRole = getSavedRole();
-    if (savedRole) setRole(savedRole);
-    setPendingRole(null);
-    setPhase("app");
+    // User will be redirected by auth state change listener
+  };
+
+  const changeRole = () => {
+    setSelectedRole(null);
+    setPhase("role");
   };
 
   return (
     <main className="min-h-screen bg-background mx-auto max-w-[480px] relative">
       {phase === "splash" && <Splash onDone={completeSplash} />}
 
-      {phase === "vision" && <VisionTab showOnboardingActions onContinue={completeVision} />}
+      {phase === "vision" && (
+        <VisionTab showOnboardingActions onContinue={() => setPhase("role")} />
+      )}
 
       {phase === "role" && <RoleSelection onSelect={selectRole} />}
 
       {phase === "auth" && (
-        <Auth
-          embedded
-          selectedRole={pendingRole}
-          confirmedRole={role}
-          onAuthenticated={handleAuthenticated}
-        />
+        <Auth embedded onAuthenticated={handleAuthenticated} />
       )}
 
-      {phase === "app" && role && session && (
+      {phase === "app" && selectedRole && session && (
         <>
           <div className="pb-24 animate-float-up">
             {tab === "vision" && <VisionTab />}
-            {tab === "home" && <HomeTab role={role} onChangeRole={changeRole} />}
+            {tab === "home" && (
+              <HomeTab role={selectedRole} onChangeRole={changeRole} />
+            )}
             {tab === "assessments" && <AssessmentsTab />}
             {tab === "sessions" && <SessionsTab />}
             {tab === "resources" && <ResourcesTab />}
